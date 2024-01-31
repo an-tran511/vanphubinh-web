@@ -1,0 +1,5 @@
+.header {
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  padding-left: var(--mantine-spacing-xl);
+  padding-right: var(--mantine-spacing-xl);
+}

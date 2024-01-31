@@ -1,0 +1,20 @@
+.control--default,
+.control {
+  &:not(:disabled, [data-disabled]) {
+    @mixin hover {
+      @mixin light {
+        --_control-background-color: 'white';
+      }
+
+      @mixin dark {
+        --_control-background-color: var(--mantine-color-dark-6);
+      }
+    }
+  }
+  padding: 0;
+}
+
+.content {
+  padding-left: 0;
+  padding-right: 0;
+}

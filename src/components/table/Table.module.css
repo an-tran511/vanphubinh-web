@@ -1,0 +1,15 @@
+.table {
+  th,
+  td {
+    vertical-align: middle;
+  }
+}
+.header {
+  text-transform: uppercase;
+  font-size: 12px;
+  background-color: lighten(var(--mantine-color-blue-0), 60%);
+  color: black;
+}
+.root {
+  border-left: none;
+}
