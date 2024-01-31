@@ -1,3 +1,5 @@
+import { TMould } from './mould'
+
 export type TPackageAndLabel = {
   id: string
   name: string
@@ -14,6 +16,7 @@ export type TPackageAndLabel = {
     thickness: number
     numberOfColors: number
   }
+  moulds: TMould[]
 }
 
 export type TPackageAndLabelMutation = {

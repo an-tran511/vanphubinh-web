@@ -1,8 +1,8 @@
 import {
   TPackageAndLabel,
   TPackageAndLabelMutation,
-} from 'types/package-and-label'
-import { TListResponse } from 'types/http'
+} from '@/types/package-and-label'
+import { TListResponse } from '@/types/http'
 import { client } from '@/utils/client'
 
 export const createPackageAndLabel = async (

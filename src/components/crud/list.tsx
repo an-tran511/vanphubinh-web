@@ -13,35 +13,35 @@ import {
   ActionIcon,
   SimpleGrid,
   Divider,
-} from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
-import { House, MagnifyingGlass, Plus } from '@phosphor-icons/react';
-import { useNavigate } from '@tanstack/react-router';
-import { ReactNode } from 'react';
-import { lighten } from '@mantine/core';
+} from '@mantine/core'
+import { useMediaQuery } from '@mantine/hooks'
+import { House, MagnifyingGlass, Plus } from '@phosphor-icons/react'
+import { useNavigate } from '@tanstack/react-router'
+import { ReactNode } from 'react'
+import { lighten } from '@mantine/core'
 
 interface ListProps {
-  children: ReactNode;
-  title: string;
-  onCreateHandler?: () => void;
+  children: ReactNode
+  title: string
+  onCreateHandler?: () => void
   pagination?: {
-    isLoading: boolean;
-    total: number;
-    page: number;
-    lastPage: number;
-    onPageChange: (page: number) => void;
-  };
+    isLoading: boolean
+    total: number
+    page: number
+    lastPage: number
+    onPageChange: (page: number) => void
+  }
 }
 
 export const List = (props: ListProps) => {
-  const { title, children, onCreateHandler, pagination } = props;
-  const { page, onPageChange, lastPage, isLoading, total } = pagination ?? {};
-  const navigate = useNavigate();
-  const defaultHandleClick = () => navigate({ to: `create` });
-  const isTablet = useMediaQuery(`(max-width: ${em(801)})`);
+  const { title, children, onCreateHandler, pagination } = props
+  const { page, onPageChange, lastPage, isLoading, total } = pagination ?? {}
+  const navigate = useNavigate()
+  const defaultHandleClick = () => navigate({ to: `create` })
+  const isTablet = useMediaQuery(`(max-width: ${em(801)})`)
 
   const createHandler =
-    typeof onCreateHandler === 'function' ? onCreateHandler : defaultHandleClick;
+    typeof onCreateHandler === 'function' ? onCreateHandler : defaultHandleClick
   const items = [
     {
       title: <House size={12} />,
@@ -52,7 +52,7 @@ export const List = (props: ListProps) => {
     <Anchor href={item.href} key={index} size="xs">
       {item.title}
     </Anchor>
-  ));
+  ))
   return (
     <Stack h={{ base: 'calc(100vh - 60px)', md: '100vh' }} gap="0">
       <Box
@@ -78,7 +78,11 @@ export const List = (props: ListProps) => {
           /> */}
           <Group justify="flex-end" gap="xs">
             {isTablet ? (
-              <ActionIcon size="md" aria-label="Settings" onClick={createHandler}>
+              <ActionIcon
+                size="md"
+                aria-label="Settings"
+                onClick={createHandler}
+              >
                 <Plus size={14} weight="bold" />
               </ActionIcon>
             ) : (
@@ -130,7 +134,11 @@ export const List = (props: ListProps) => {
               radius="xl"
             />
           </Group>
-          <Group justify="space-between" py={{ base: 'xs', md: 'sm' }} hiddenFrom="md">
+          <Group
+            justify="space-between"
+            py={{ base: 'xs', md: 'sm' }}
+            hiddenFrom="md"
+          >
             <Text c="dimmed" size="xs">
               <b>
                 {(page - 1) * 30 + 1} - {page === lastPage ? total : page * 30}
@@ -156,5 +164,5 @@ export const List = (props: ListProps) => {
         </Box>
       )}
     </Stack>
-  );
-};
+  )
+}

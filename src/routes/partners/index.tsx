@@ -9,8 +9,8 @@ import { z } from 'zod'
 import classes from '@/components/table/Table.module.css'
 import { useEffect, useState } from 'react'
 import { partnersQueryOptions } from '@/apis/query-options'
-import { TListResponse } from 'types/http'
-import { TPartner } from 'types/partner'
+import { TListResponse } from '@/types/http'
+import { TPartner } from '@/types/partner'
 
 const partnerSearchSchema = z.object({
   page: z.number().catch(1),
@@ -143,7 +143,7 @@ function DashboardComponent() {
         </Group>
       </Box> */}
       <DataTable
-        withTableBorder
+        withTableBorder={false}
         minHeight={180}
         classNames={{
           header: classes.header,

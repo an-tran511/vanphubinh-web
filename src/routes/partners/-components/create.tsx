@@ -1,5 +1,5 @@
 import { createPartner } from '@/apis/partner'
-import { TNewPartner, TPartner } from 'types/partner'
+import { TNewPartner, TPartner } from '@/types/partner'
 import { Button, Checkbox, Group, Stack, TextInput } from '@mantine/core'
 import { useMutation } from '@tanstack/react-query'
 import { Field, Form } from 'houseform'

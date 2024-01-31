@@ -19,13 +19,14 @@ import {
   NumberInput,
 } from '@mantine/core'
 import { useDebouncedValue, useFocusTrap } from '@mantine/hooks'
-import { Field } from 'houseform'
+import { Field, FieldArray, FieldArrayItem } from 'houseform'
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import accClasses from '@/components/accordion/Accordion.module.css'
 import { Cylinder, Info } from '@phosphor-icons/react'
 import { TPartner } from '@/types/partner'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { TMould, TMouldMutation } from '@/types/mould'
 
 interface PackageAndLabelFormProps {
   data?: TPackageAndLabel
@@ -463,93 +464,136 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
             </Accordion.Item>
           </Accordion>
         </Tabs.Panel>
-        <Tabs.Panel value="mould">
-          <Stack gap="sm" mt="sm">
-            <SimpleGrid
-              cols={{ base: 1, md: 2 }}
-              spacing={{ base: 10, sm: 'xl' }}
-              verticalSpacing="md"
-            >
-              <Field name="mould.dimension">
-                {({ value, setValue, onBlur }) => (
-                  <TextInput
-                    radius="md"
-                    label="Kích thước trục"
-                    size="sm"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    onBlur={onBlur}
-                  />
-                )}
-              </Field>
-              <Field name="mould.numberOfMoulds">
-                {({ value, setValue, onBlur }) => (
-                  <NumberInput
-                    radius="md"
-                    label="Số cây trục trong bộ"
-                    size="sm"
-                    value={value}
-                    onChange={(val) => setValue(val as number)}
-                    onBlur={onBlur}
-                    hideControls
-                  />
-                )}
-              </Field>
-            </SimpleGrid>
-            <SimpleGrid
-              cols={{ base: 1, md: 2 }}
-              spacing={{ base: 10, sm: 'xl' }}
-              verticalSpacing="md"
-            >
-              <Field name="mould.location">
-                {({ value, setValue, onBlur }) => (
-                  <TextInput
-                    radius="md"
-                    label="Vị trí trục"
-                    size="sm"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    onBlur={onBlur}
-                  />
-                )}
-              </Field>
 
-              <Field name="mould.itemCode">
-                {({ value, setValue, onBlur }) => (
-                  <TextInput
+        <Tabs.Panel value="mould">
+          <FieldArray name={'moulds'}>
+            {({ add, value }) => (
+              <>
+                {value.map((mould, i) => (
+                  <Card
+                    withBorder
+                    shadow="sm"
                     radius="md"
-                    label="Mã trục"
-                    size="sm"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    onBlur={onBlur}
-                  />
-                )}
-              </Field>
-            </SimpleGrid>
-            <SimpleGrid
-              cols={{ base: 1, md: 2 }}
-              spacing={{ base: 10, sm: 'xl' }}
-              verticalSpacing="md"
-            >
-              <Field
-                name="mould.mouldMakerId"
-                initialValue={data && data.specs.thickness}
-              >
-                {({ value, setValue, onBlur }) => (
-                  <NumberInput
-                    radius="md"
-                    label="Nhà trục"
-                    size="sm"
-                    value={value}
-                    onChange={(val) => setValue(val as number)}
-                    onBlur={onBlur}
-                    hideControls
-                  />
-                )}
-              </Field>
-            </SimpleGrid>
-          </Stack>
+                    mt="sm"
+                    key={`mould-${i}`}
+                  >
+                    <Stack gap="sm" mt="sm">
+                      <SimpleGrid
+                        cols={{ base: 1, md: 2 }}
+                        spacing={{ base: 10, sm: 'xl' }}
+                        verticalSpacing="md"
+                      >
+                        <FieldArrayItem
+                          name={`moulds[${i}].specs.dimension`}
+                          key={`mould-dimension-${i}`}
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <TextInput
+                              radius="md"
+                              label="Kích thước trục"
+                              size="sm"
+                              value={value}
+                              onChange={(e) => setValue(e.target.value)}
+                              onBlur={onBlur}
+                            />
+                          )}
+                        </FieldArrayItem>
+                        <FieldArrayItem
+                          name={`moulds[${i}].numberOfMoulds`}
+                          key={`mould-specs-numberOfMoulds-${i}`}
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <NumberInput
+                              radius="md"
+                              label="Số cây trục trong bộ"
+                              size="sm"
+                              value={value}
+                              onChange={(val) => setValue(val as number)}
+                              onBlur={onBlur}
+                              hideControls
+                            />
+                          )}
+                        </FieldArrayItem>
+                      </SimpleGrid>
+                      {/* <SimpleGrid
+                        cols={{ base: 1, md: 2 }}
+                        spacing={{ base: 10, sm: 'xl' }}
+                        verticalSpacing="md"
+                      >
+                        <FieldArrayItem
+                          name={`moulds[${i}].specs.location`}
+                          key={`mould-specs-location-${i}`}
+                          initialValue={data && data.moulds[0]?.specs?.location}
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <TextInput
+                              radius="md"
+                              label="Vị trí trục"
+                              size="sm"
+                              value={value}
+                              onChange={(e) => setValue(e.target.value)}
+                              onBlur={onBlur}
+                            />
+                          )}
+                        </FieldArrayItem>
+
+                        <FieldArrayItem
+                          name={`moulds[${i}].itemCode`}
+                          key={`mould-itemCode-${i}`}
+                          initialValue={data && data.moulds[0]?.itemCode}
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <TextInput
+                              radius="md"
+                              label="Mã trục"
+                              size="sm"
+                              value={value}
+                              onChange={(e) => setValue(e.target.value)}
+                              onBlur={onBlur}
+                            />
+                          )}
+                        </FieldArrayItem>
+                      </SimpleGrid>
+                      <SimpleGrid
+                        cols={{ base: 1, md: 2 }}
+                        spacing={{ base: 10, sm: 'xl' }}
+                        verticalSpacing="md"
+                      >
+                        <FieldArrayItem
+                          name={`moulds[${i}].specs.mouldMakerId`}
+                          key={`mould-specs-itemCode-${i}`}
+                          onChangeValidate={z
+                            .string()
+                            .transform((val) => Number(val))}
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <CreatableSelect
+                              size="sm"
+                              radius="md"
+                              value={value}
+                              label="Nhà trục"
+                              data={partnerOptions}
+                              onChange={(value) => {
+                                setValue(value || '')
+                              }}
+                              onBlur={onBlur}
+                              searchable
+                              creatable
+                              onSearchChange={onSearchPartner}
+                              isLoadingOptions={partnerSelectLoading}
+                              rightSection={<ComboboxChevron />}
+                              rightSectionPointerEvents="none"
+                            />
+                          )}
+                        </FieldArrayItem>
+                      </SimpleGrid> */}
+                    </Stack>
+                  </Card>
+                ))}
+                <button onClick={() => add({ specs: {} })}>Set value</button>
+              </>
+            )}
+          </FieldArray>
         </Tabs.Panel>
       </Tabs>
     </Card>

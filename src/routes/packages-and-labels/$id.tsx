@@ -11,7 +11,7 @@ import { PackageAndLabelForm } from './-components/package-and-label-form'
 import {
   TPackageAndLabel,
   TPackageAndLabelMutation,
-} from 'types/package-and-label'
+} from '@/types/package-and-label'
 import { toast } from 'sonner'
 import { createPackageAndLabel } from '@/apis/package-and-label'
 import { useRef } from 'react'

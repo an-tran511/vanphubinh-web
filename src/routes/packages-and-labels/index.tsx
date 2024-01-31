@@ -173,7 +173,7 @@ function ListComponent() {
         <CreateComponent />
       </Modal> */}
       <DataTable
-        withTableBorder
+        withTableBorder={false}
         minHeight={180}
         classNames={{
           root: classes.root,
