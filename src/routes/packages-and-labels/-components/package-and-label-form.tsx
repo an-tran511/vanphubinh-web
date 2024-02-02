@@ -17,16 +17,20 @@ import {
   Tabs,
   Accordion,
   NumberInput,
+  Button,
+  Group,
+  Box,
+  ActionIcon,
+  Tooltip,
 } from '@mantine/core'
 import { useDebouncedValue, useFocusTrap } from '@mantine/hooks'
 import { Field, FieldArray, FieldArrayItem } from 'houseform'
 import { useMemo, useState } from 'react'
 import { z } from 'zod'
 import accClasses from '@/components/accordion/Accordion.module.css'
-import { Cylinder, Info } from '@phosphor-icons/react'
+import { ArrowRight, Cylinder, Info } from '@phosphor-icons/react'
 import { TPartner } from '@/types/partner'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { TMould, TMouldMutation } from '@/types/mould'
 
 interface PackageAndLabelFormProps {
   data?: TPackageAndLabel
@@ -110,8 +114,9 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
   const focusTrapRef = useFocusTrap()
 
   return (
-    <Card shadow="0" radius="0" px="xl">
+    <Card shadow="0" radius="0" px={{ base: 'lg', md: 'xl' }}>
       <Field
+        key="name"
         name="name"
         initialValue={data && data.name}
         onChangeValidate={z.string().min(1, { message: 'Trường bắt buộc' })}
@@ -317,46 +322,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                       )}
                     </Field>
                   </SimpleGrid>
-                  {/* <Stack gap={2}>
-                    <Text fw="500" size="sm">
-                      Hình ảnh (tối đa 3 ảnh)
-                    </Text>
-                    <Group>
-                      <Dropzone
-                        onDrop={() => {}}
-                        accept={IMAGE_MIME_TYPE}
-                        h={150}
-                        w={150}
-                        radius="md"
-                      >
-                        <Text ta="center">Drop images here</Text>
-                      </Dropzone>
-                      <Image
-                        radius="md"
-                        h={150}
-                        w={150}
-                        src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-                      />
-                      <Image
-                        radius="md"
-                        h={150}
-                        w={150}
-                        src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-                      />
-                      <Image
-                        radius="md"
-                        h={150}
-                        w={150}
-                        src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-                      />
-                      <Image
-                        radius="md"
-                        h={150}
-                        w={150}
-                        src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-                      />
-                    </Group>
-                  </Stack> */}
+
                   <Field name="note" initialValue={data && data.note}>
                     {({ value, setValue, onBlur, errors }) => (
                       <Textarea
@@ -466,18 +432,143 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
         </Tabs.Panel>
 
         <Tabs.Panel value="mould">
+          <Box mt="sm">
+            {' '}
+            {data &&
+              data.moulds.length > 0 &&
+              data.moulds.map((mould, i) => (
+                <Card withBorder shadow="xs" key={`mould-${i}`}>
+                  <Card.Section inheritPadding withBorder py="xs">
+                    <Group justify="space-between">
+                      <Text size="sm" fw={500}>
+                        {mould.name}
+                      </Text>
+                      <Tooltip label="Đi tới trang trục">
+                        <ActionIcon variant="default" aria-label="Settings">
+                          <ArrowRight />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Group>
+                  </Card.Section>
+                  <Stack gap="md" mt="sm">
+                    <SimpleGrid
+                      cols={{ base: 1, md: 2 }}
+                      spacing={{ base: 10, sm: 'xl' }}
+                      verticalSpacing="md"
+                    >
+                      <Stack gap="0">
+                        <Text size="sm" fw="500">
+                          Khách hàng
+                        </Text>
+                        <Text size="sm">{mould.partner?.name}</Text>
+                      </Stack>
+                      <Stack gap="0">
+                        <Text size="sm" fw="500">
+                          Mã trục
+                        </Text>
+                        <Text size="sm">{mould.itemCode}</Text>
+                      </Stack>
+                    </SimpleGrid>
+                    <SimpleGrid
+                      cols={{ base: 1, md: 2 }}
+                      spacing={{ base: 10, sm: 'xl' }}
+                      verticalSpacing="md"
+                    >
+                      <Stack gap="0">
+                        <Text size="sm" fw="500">
+                          Kích thước trục
+                        </Text>
+                        <Text size="sm">{mould.specs?.dimension}</Text>
+                      </Stack>
+                      <Stack gap="0">
+                        <Text size="sm" fw="500">
+                          Số cây trục trong bộ
+                        </Text>
+                        <Text size="sm">{mould.specs?.numberOfMoulds}</Text>
+                      </Stack>
+                    </SimpleGrid>
+                    <SimpleGrid
+                      cols={{ base: 1, md: 2 }}
+                      spacing={{ base: 10, sm: 'xl' }}
+                      verticalSpacing="md"
+                    >
+                      <Stack gap="0">
+                        <Text size="sm" fw="500">
+                          Vị trí trục
+                        </Text>
+                        <Text size="sm">{mould.specs?.location}</Text>
+                      </Stack>
+                      <Stack gap="0">
+                        <Text size="sm" fw="500">
+                          Nhà trục
+                        </Text>
+                        <Text size="sm">{mould.specs?.mouldMakerId}</Text>
+                      </Stack>
+                    </SimpleGrid>
+                  </Stack>
+                </Card>
+              ))}
+          </Box>
           <FieldArray name={'moulds'}>
             {({ add, value }) => (
               <>
                 {value.map((mould, i) => (
                   <Card
                     withBorder
-                    shadow="sm"
                     radius="md"
                     mt="sm"
-                    key={`mould-${i}`}
+                    key={`new-mould-${i}`}
+                    shadow="xs"
                   >
-                    <Stack gap="sm" mt="sm">
+                    <Stack gap="sm">
+                      <SimpleGrid
+                        cols={{ base: 1, md: 2 }}
+                        spacing={{ base: 10, sm: 'xl' }}
+                        verticalSpacing="md"
+                      >
+                        <FieldArrayItem
+                          name={`moulds[${i}].partnerId`}
+                          key={`mould-specs-partner-${i}`}
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <CreatableSelect
+                              size="sm"
+                              radius="md"
+                              value={value}
+                              label="Khách hàng"
+                              data={partnerOptions}
+                              onChange={(value) => {
+                                setValue(value || '')
+                              }}
+                              onBlur={onBlur}
+                              searchable
+                              creatable
+                              onSearchChange={onSearchPartner}
+                              isLoadingOptions={partnerSelectLoading}
+                              rightSection={<ComboboxChevron />}
+                              rightSectionPointerEvents="none"
+                            />
+                          )}
+                        </FieldArrayItem>
+                        <FieldArrayItem
+                          name={`moulds[${i}].itemCode`}
+                          key={`mould-itemCode-${i}`}
+                          initialValue={
+                            (data && data.moulds[0]?.itemCode) || ''
+                          }
+                        >
+                          {({ value, setValue, onBlur }) => (
+                            <TextInput
+                              radius="md"
+                              label="Mã trục"
+                              size="sm"
+                              value={value}
+                              onChange={(e) => setValue(e.target.value)}
+                              onBlur={onBlur}
+                            />
+                          )}
+                        </FieldArrayItem>
+                      </SimpleGrid>
                       <SimpleGrid
                         cols={{ base: 1, md: 2 }}
                         spacing={{ base: 10, sm: 'xl' }}
@@ -499,7 +590,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           )}
                         </FieldArrayItem>
                         <FieldArrayItem
-                          name={`moulds[${i}].numberOfMoulds`}
+                          name={`moulds[${i}].specs.numberOfMoulds`}
                           key={`mould-specs-numberOfMoulds-${i}`}
                         >
                           {({ value, setValue, onBlur }) => (
@@ -515,7 +606,8 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           )}
                         </FieldArrayItem>
                       </SimpleGrid>
-                      {/* <SimpleGrid
+
+                      <SimpleGrid
                         cols={{ base: 1, md: 2 }}
                         spacing={{ base: 10, sm: 'xl' }}
                         verticalSpacing="md"
@@ -536,29 +628,6 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                             />
                           )}
                         </FieldArrayItem>
-
-                        <FieldArrayItem
-                          name={`moulds[${i}].itemCode`}
-                          key={`mould-itemCode-${i}`}
-                          initialValue={data && data.moulds[0]?.itemCode}
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <TextInput
-                              radius="md"
-                              label="Mã trục"
-                              size="sm"
-                              value={value}
-                              onChange={(e) => setValue(e.target.value)}
-                              onBlur={onBlur}
-                            />
-                          )}
-                        </FieldArrayItem>
-                      </SimpleGrid>
-                      <SimpleGrid
-                        cols={{ base: 1, md: 2 }}
-                        spacing={{ base: 10, sm: 'xl' }}
-                        verticalSpacing="md"
-                      >
                         <FieldArrayItem
                           name={`moulds[${i}].specs.mouldMakerId`}
                           key={`mould-specs-itemCode-${i}`}
@@ -586,11 +655,19 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                             />
                           )}
                         </FieldArrayItem>
-                      </SimpleGrid> */}
+                      </SimpleGrid>
                     </Stack>
                   </Card>
                 ))}
-                <button onClick={() => add({ specs: {} })}>Set value</button>
+                <Group mt="sm" justify="flex-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => add({ specs: {} })}
+                    size="xs"
+                  >
+                    Thêm bộ trục
+                  </Button>
+                </Group>
               </>
             )}
           </FieldArray>

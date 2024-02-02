@@ -1,3 +1,5 @@
+import { TPartner } from './partner'
+
 export type TMouldMutation = {
   name: string
   uomId: number
@@ -14,6 +16,7 @@ export type TMouldMutation = {
 }
 
 export type TMould = {
+  partner: TPartner
   id: string
   name: string
   uomId: number

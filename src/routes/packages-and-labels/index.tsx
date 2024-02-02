@@ -86,18 +86,12 @@ function ListComponent() {
       accessor: 'specs.dimension',
       title: 'Kích thước',
     },
-    {
-      accessor: 'specs.dimension',
-      title: 'Kích thước trải',
-    },
+
     {
       accessor: 'specs.numberOFColors',
       title: 'Độ dày',
     },
-    {
-      accessor: 'specs.numberOFColors',
-      title: 'Số màu',
-    },
+
     {
       accessor: 'partner.name',
       title: 'Khách hàng',

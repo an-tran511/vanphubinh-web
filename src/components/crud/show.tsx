@@ -13,28 +13,28 @@ import {
   ScrollArea,
   Drawer,
   Badge,
-} from '@mantine/core';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { CaretDown, FloppyDisk, Note } from '@phosphor-icons/react';
-import { ReactNode } from 'react';
-import classes from './Crud.module.css';
+} from '@mantine/core'
+import { useDisclosure, useMediaQuery } from '@mantine/hooks'
+import { CaretDown, FloppyDisk, Note } from '@phosphor-icons/react'
+import { ReactNode } from 'react'
+import classes from './Crud.module.css'
 
 interface CreateProps {
-  children: ReactNode;
-  title: string;
-  isDirty?: boolean;
-  submitHandler?: () => void;
+  children: ReactNode
+  title: string
+  isDirty?: boolean
+  submitHandler?: () => void
 }
 
 export const Show = (props: CreateProps) => {
-  const { children, title, isDirty, submitHandler } = props;
-  const isTablet = useMediaQuery(`(max-width: ${em(801)})`);
-  const [opened, { open, close }] = useDisclosure(false);
+  const { children, title, isDirty, submitHandler } = props
+  const isTablet = useMediaQuery(`(max-width: ${em(801)})`)
+  const [opened, { open, close }] = useDisclosure(false)
 
   return (
     <Stack h={{ base: 'calc(100vh - 60px)', md: '100vh' }} gap="0">
       <Box
-        px="xl"
+        px={{ base: 'lg', md: 'xl' }}
         py="md"
         style={{
           borderBottom: '1px solid var(--mantine-color-gray-3)',
@@ -46,7 +46,12 @@ export const Show = (props: CreateProps) => {
           <Group>
             <Title order={isTablet ? 4 : 2}>{title}</Title>
             {isDirty && (
-              <Badge color="gray" variant="light" radius="sm" size={isTablet ? 'xs' : 'sm'}>
+              <Badge
+                color="gray"
+                variant="light"
+                radius="sm"
+                size={isTablet ? 'xs' : 'sm'}
+              >
                 Thay đổi chưa được lưu
               </Badge>
             )}
@@ -91,7 +96,13 @@ export const Show = (props: CreateProps) => {
         <Box className={classes.aside} visibleFrom="md">
           <Card px="xl" bg="gray.0">
             <Group>
-              <Popover width="target" position="bottom" withArrow shadow="md" offset={-5}>
+              <Popover
+                width="target"
+                position="bottom"
+                withArrow
+                shadow="md"
+                offset={-5}
+              >
                 <Popover.Target>
                   <Button
                     color="gray.0"
@@ -169,5 +180,5 @@ export const Show = (props: CreateProps) => {
         ></Drawer>
       </Box>
     </Stack>
-  );
-};
+  )
+}
