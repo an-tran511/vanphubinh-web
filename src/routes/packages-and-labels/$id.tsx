@@ -6,15 +6,13 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query'
 import { Show } from '@/components/crud/show'
-import { Form, FormInstance } from 'houseform'
 import { PackageAndLabelForm } from './-components/package-and-label-form'
-import {
-  TPackageAndLabel,
-  TPackageAndLabelMutation,
-} from '@/types/package-and-label'
+import { TPackageAndLabel } from '@/types/package-and-label'
 import { toast } from 'sonner'
-import { createPackageAndLabel } from '@/apis/package-and-label'
-import { useRef } from 'react'
+import { updatePackageAndLabel } from '@/apis/package-and-label'
+import { useForm } from 'react-hook-form'
+import { schema } from '@/schemas/package-and-label'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 export const Route = createFileRoute('/packages-and-labels/$id')({
   component: DetailComponent,
@@ -23,43 +21,104 @@ export const Route = createFileRoute('/packages-and-labels/$id')({
     queryClient.ensureQueryData(TPackageAndLabelQueryOptions(params.id))
   },
 })
-
 export function DetailComponent() {
   const { id } = useParams({ strict: false })
   const { data } = useSuspenseQuery(TPackageAndLabelQueryOptions(id))
-  const formRef = useRef<FormInstance<TPackageAndLabelMutation>>(null)
+  const navigate = useNavigate({ from: '/packages-and-labels/$itemId' })
   const queryClient = useQueryClient()
-  const navigate = useNavigate({ from: '/packages-and-labels/create' })
-
-  //Mutation
-  const mutation = useMutation({
-    mutationFn: (values: TPackageAndLabelMutation) =>
-      createPackageAndLabel(values),
-    onSuccess: (data: TPackageAndLabel) => {
-      const itemId = data.id
-      queryClient.invalidateQueries({ queryKey: ['packages-and-labels'] })
-      navigate({ to: '/packages-and-labels/$itemId', params: { itemId } })
-
-      toast.success(`${data.name} đã được tạo thành công`)
+  const {
+    control,
+    handleSubmit,
+    clearErrors,
+    resetField,
+    formState: { isDirty },
+    reset,
+  } = useForm<TPackageAndLabel>({
+    // resolver: zodResolver(schema),
+    defaultValues: {
+      id: data.id,
+      name: data.name,
+      uomId: data.uomId,
+      secondaryUomId: data.secondaryUomId,
+      purchaseUomId: data.purchaseUomId,
+      partnerId: data.partnerId,
+      categoryId: data.categoryId,
+      firstItemCode: data.firstItemCode || '',
+      secondItemCode: data.secondItemCode || '',
+      note: data.note || '',
+      specs: {
+        dimension: data?.specs?.dimension || '',
+        numberOfColors: data?.specs?.numberOfColors,
+        spreadDimension: data?.specs?.spreadDimension || '',
+        thickness: data?.specs?.thickness,
+      },
+      newMoulds: [],
     },
   })
 
-  const doSubmit = () => {
-    formRef?.current?.submit()
+  //Mutation
+  const { mutate, isPending } = useMutation({
+    mutationKey: ['packages-and-labels', 'update', id],
+    mutationFn: updatePackageAndLabel,
+    onSuccess: () => {
+      queryClient.invalidateQueries()
+      navigate({ to: '/packages-and-labels/$itemId', params: { itemId: id } })
+      toast.success(`Cập nhật thành công`)
+    },
+  })
+
+  const onSubmit = (data: TPackageAndLabel) => {
+    mutate(data, {
+      onSuccess: () => {
+        resetField('newMoulds', {
+          defaultValue: [],
+        })
+        reset(
+          {
+            id: data.id,
+            name: data.name,
+            uomId: data.uomId,
+            secondaryUomId: data.secondaryUomId,
+            purchaseUomId: data.purchaseUomId,
+            partnerId: data.partnerId,
+            categoryId: data.categoryId,
+            firstItemCode: data.firstItemCode || '',
+            secondItemCode: data.secondItemCode || '',
+            note: data.note || '',
+            specs: {
+              dimension: data?.specs?.dimension || '',
+              numberOfColors: data?.specs?.numberOfColors,
+              spreadDimension: data?.specs?.spreadDimension || '',
+              thickness: data?.specs?.thickness,
+            },
+          },
+          {
+            keepDirtyValues: true,
+          },
+        )
+      },
+    })
   }
+
   return (
-    <Form
-      onSubmit={(values: TPackageAndLabelMutation) => mutation.mutate(values)}
+    <form
+      onSubmit={(e) => {
+        clearErrors()
+        handleSubmit(onSubmit)(e)
+      }}
     >
-      {({ isDirty }) => (
-        <Show
-          title="Bao bì & nhãn mác"
-          submitHandler={doSubmit}
-          isDirty={isDirty}
-        >
-          <PackageAndLabelForm data={data} />
-        </Show>
-      )}
-    </Form>
+      <Show
+        title="Bao bì & nhãn mác"
+        isDirty={isDirty}
+        recordId={id}
+        savingState={isPending}
+      >
+        <PackageAndLabelForm
+          control={control}
+          viewType="detail"
+          moulds={data?.moulds}
+        />
+      </Show>
+    </form>
   )
 }

@@ -19,24 +19,24 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false, // default: true
     },
   },
-  queryCache: new QueryCache({
-    onError: (error, query) => {
-      // 🎉 only show error toasts if we already have data in the cache
-      // which indicates a failed background update
-      if (query.state.data !== undefined) {
-        toast.error(`Lỗi: ${error.message}`)
-      }
-      toast.error(`Lỗi: ${error.message}`)
-    },
-  }),
-  mutationCache: new MutationCache({
-    onError: (error: { message: string }) => {
-      // 🎉 only show error toasts if we already have data in the cache
-      // which indicates a failed background update
+  // queryCache: new QueryCache({
+  //   onError: (error, query) => {
+  //     // 🎉 only show error toasts if we already have data in the cache
+  //     // which indicates a failed background update
+  //     if (query.state.data !== undefined) {
+  //       toast.error(`Lỗi: ${error.message}`)
+  //     }
+  //     toast.error(`Lỗi: ${error.message}`)
+  //   },
+  // }),
+  // mutationCache: new MutationCache({
+  //   onError: (error: { message: string }) => {
+  //     // 🎉 only show error toasts if we already have data in the cache
+  //     // which indicates a failed background update
 
-      toast.error(`Lỗi: ${error.message}`)
-    },
-  }),
+  //     toast.error(`Lỗi: ${error.message}`)
+  //   },
+  // }),
 })
 
 const router = new Router({

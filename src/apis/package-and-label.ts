@@ -4,11 +4,22 @@ import {
 } from '@/types/package-and-label'
 import { TListResponse } from '@/types/http'
 import { client } from '@/utils/client'
+import { PickAsRequired } from '@tanstack/react-router'
 
-export const createPackageAndLabel = async (
-  newPackage: TPackageAndLabelMutation,
-) => {
+export const createPackageAndLabel = async ({
+  ...newPackage
+}: Partial<TPackageAndLabel>) => {
   const response = await client.url('/packages-and-labels').post(newPackage)
+  return response as TPackageAndLabel
+}
+
+export const updatePackageAndLabel = async ({
+  id,
+  ...packageAndLabel
+}: PickAsRequired<Partial<TPackageAndLabel>, 'id'>) => {
+  const response = await client
+    .url(`/packages-and-labels/${id}`)
+    .put(packageAndLabel)
   return response as TPackageAndLabel
 }
 

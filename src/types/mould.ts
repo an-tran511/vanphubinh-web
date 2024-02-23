@@ -1,33 +1,12 @@
-import { TPartner } from './partner'
+import { TItem } from './item'
 
-export type TMouldMutation = {
-  name: string
-  uomId: number
-  partnerId?: number
-  categoryId?: number
-  itemCode?: string
-  note?: string
+export type TMould = TItem & {
   specs?: {
     location?: string
     dimension?: string
     numberOfMoulds?: number
-    mouldMakerId?: number
   }
 }
-
-export type TMould = {
-  partner: TPartner
-  id: string
-  name: string
-  uomId: number
-  partnerId?: number
-  categoryId?: number
-  itemCode?: string
-  note?: string
-  specs?: {
-    location?: string
-    dimension?: string
-    numberOfMoulds?: number
-    mouldMakerId?: number
-  }
+export type TNewMould = Omit<TMould, 'id' | 'uomId' | 'name'> & {
+  mouldMakerId?: number
 }

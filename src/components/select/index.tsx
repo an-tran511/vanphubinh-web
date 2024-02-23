@@ -1,5 +1,5 @@
-import cx from 'clsx';
-import { useMemo } from 'react';
+import cx from 'clsx'
+import { useMemo } from 'react'
 
 import {
   Combobox,
@@ -18,38 +18,43 @@ import {
   useProps,
   Input,
   Loader,
-} from '@mantine/core';
-import { useUncontrolled } from '@mantine/hooks';
+} from '@mantine/core'
+import { useUncontrolled } from '@mantine/hooks'
 
-import classes from './Combobox.module.css';
-import { validateOptions } from './validate-options';
+import classes from './Combobox.module.css'
+import { validateOptions } from './validate-options'
 
 export interface CreatableSelectProps extends SelectProps {
-  creatable?: boolean;
-  onCreate?(query: string): ComboboxItem | string | null | undefined | void;
-  data: ComboboxData;
-  isLoadingOptions?: boolean;
-  shouldClientFilter?: boolean;
+  creatable?: boolean
+  onCreate?(query: string): ComboboxItem | string | null | undefined | void
+  data: ComboboxData
+  isLoadingOptions?: boolean
+  shouldClientFilter?: boolean
 }
 
-function isValueChecked(value: string | string[] | undefined | null, optionValue: string) {
-  return Array.isArray(value) ? value.includes(optionValue) : value === optionValue;
+function isValueChecked(
+  value: string | string[] | undefined | null,
+  optionValue: string,
+) {
+  return Array.isArray(value)
+    ? value.includes(optionValue)
+    : value === optionValue
 }
 
 export type SelectFactory = Factory<{
-  props: CreatableSelectProps;
-  ref: HTMLInputElement;
-}>;
+  props: CreatableSelectProps
+  ref: HTMLInputElement
+}>
 
 const defaultProps: Partial<SelectProps> = {
   searchable: false,
   withCheckIcon: true,
   allowDeselect: true,
   checkIconPosition: 'left',
-};
+}
 
 export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
-  const props = useProps('CreatableSelect', defaultProps, _props);
+  const props = useProps('CreatableSelect', defaultProps, _props)
   const {
     creatable = false,
     searchValue,
@@ -74,47 +79,51 @@ export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
     description,
     isLoadingOptions,
     radius,
+    withAsterisk,
     filter,
     onChange,
     onSearchChange,
     onCreate,
-  } = props;
-  validateOptions([...data]);
+  } = props
+  validateOptions([...data])
 
   const [_value, setValue] = useUncontrolled({
     value,
     defaultValue,
     finalValue: null,
     onChange,
-  });
-  const parsedData = useMemo(() => getParsedComboboxData(data), [data]);
+  })
+  const parsedData = useMemo(() => getParsedComboboxData(data), [data])
 
-  const optionsLockup = useMemo(() => getOptionsLockup(parsedData), [parsedData]);
-  const selectedOption = _value ? optionsLockup[_value] : undefined;
+  const optionsLockup = useMemo(
+    () => getOptionsLockup(parsedData),
+    [parsedData],
+  )
+  const selectedOption = _value ? optionsLockup[_value] : undefined
   const [search, setSearch] = useUncontrolled({
     value: searchValue,
     defaultValue: defaultSearchValue,
     finalValue: '',
     onChange: onSearchChange,
-  });
+  })
 
   const combobox = useCombobox({
     onDropdownClose: () => {
-      combobox.resetSelectedOption();
-      combobox.focusTarget();
-      setSearch('');
+      combobox.resetSelectedOption()
+      combobox.focusTarget()
+      setSearch('')
     },
     onDropdownOpen: () => {
-      combobox.focusSearchInput();
+      combobox.focusSearchInput()
     },
-  });
+  })
   const exactOptionMatch = parsedData?.some((item) => {
     if (!isOptionsGroup(item)) {
-      return item.label === search;
+      return item.label === search
     }
-  });
+  })
 
-  const shouldFilter = typeof search === 'string';
+  const shouldFilter = typeof search === 'string'
 
   const filteredData =
     shouldFilter && shouldClientFilter
@@ -123,7 +132,7 @@ export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
           search: search,
           limit: Infinity,
         })
-      : parsedData;
+      : parsedData
 
   const options = filteredData.map((item: ComboboxParsedItem) => {
     if (!isOptionsGroup(item)) {
@@ -138,15 +147,15 @@ export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
         >
           {item.label}
         </Combobox.Option>
-      );
+      )
     }
-  });
+  })
   const getLabel = () => {
     if (selectedOption) {
-      return selectedOption.label;
+      return selectedOption.label
     }
-    return <Input.Placeholder>{placeholder}</Input.Placeholder>;
-  };
+    return <Input.Placeholder>{placeholder}</Input.Placeholder>
+  }
 
   return (
     <Combobox
@@ -158,26 +167,27 @@ export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
           ? optionsLockup[val].value === _value
             ? null
             : optionsLockup[val].value
-          : optionsLockup[val].value;
+          : optionsLockup[val].value
         if (creatable && val === '$create') {
           if (typeof onCreate === 'function') {
-            const createdItem = onCreate(search);
+            const createdItem = onCreate(search)
             if (typeof createdItem !== 'undefined' && createdItem !== null) {
               if (typeof createdItem === 'string') {
-                setValue(createdItem);
+                setValue(createdItem)
               } else {
-                setValue(createdItem.value);
+                setValue(createdItem.value)
               }
             }
           }
         } else {
-          setValue(nextValue);
+          setValue(nextValue)
         }
-        combobox.closeDropdown();
+        combobox.closeDropdown()
       }}
     >
       <Combobox.Target targetType={'button'}>
         <InputBase
+          withAsterisk={withAsterisk}
           description={description}
           classNames={classNames}
           required={required}
@@ -211,7 +221,7 @@ export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
             variant="filled"
             value={search}
             onChange={(event) => {
-              setSearch(event.currentTarget.value);
+              setSearch(event.currentTarget.value)
             }}
             placeholder="Tìm kiếm..."
             ref={ref}
@@ -219,12 +229,16 @@ export const CreatableSelect = factory<SelectFactory>((_props, ref) => {
           />
         ) : null}
         <Combobox.Options mah={300} style={{ overflowY: 'auto' }}>
-          {options.length > 0 ? options : <Combobox.Empty>Không có dữ liệu</Combobox.Empty>}
+          {options.length > 0 ? (
+            options
+          ) : (
+            <Combobox.Empty>Không có dữ liệu</Combobox.Empty>
+          )}
           {creatable && !exactOptionMatch && search.trim().length > 0 && (
             <Combobox.Option value="$create">+ Tạo {search}</Combobox.Option>
           )}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
-  );
-});
+  )
+})

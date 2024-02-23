@@ -22,12 +22,11 @@ import classes from './Crud.module.css'
 interface CreateProps {
   children: ReactNode
   title: string
-  submitHandler?: () => void
   savingState?: boolean
 }
 
 export const Create = (props: CreateProps) => {
-  const { children, title, savingState, submitHandler } = props
+  const { children, title, savingState } = props
   const isTablet = useMediaQuery(`(max-width: ${em(801)})`)
   const [opened, { open, close }] = useDisclosure(false)
   return (
@@ -55,7 +54,7 @@ export const Create = (props: CreateProps) => {
                 <ActionIcon
                   size="md"
                   aria-label="Save"
-                  onClick={submitHandler}
+                  type="submit"
                   loading={savingState}
                 >
                   <Plus size={14} weight="bold" />
@@ -77,7 +76,7 @@ export const Create = (props: CreateProps) => {
                   variant="filled"
                   radius="md"
                   justify="space-between"
-                  onClick={submitHandler}
+                  type="submit"
                   loading={savingState}
                 >
                   Tạo

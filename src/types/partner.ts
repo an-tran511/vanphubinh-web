@@ -7,6 +7,7 @@ export type TPartnerQuery = {
 export type TPartner = {
   id: number
   name: string
+  computedName: string
   address: string
   phone: string
   email: string

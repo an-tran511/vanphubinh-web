@@ -24,13 +24,14 @@ interface CreateProps {
   title: string
   isDirty?: boolean
   submitHandler?: () => void
+  recordId: string
+  savingState?: boolean
 }
 
 export const Show = (props: CreateProps) => {
-  const { children, title, isDirty, submitHandler } = props
+  const { children, title, isDirty, recordId, savingState } = props
   const isTablet = useMediaQuery(`(max-width: ${em(801)})`)
   const [opened, { open, close }] = useDisclosure(false)
-
   return (
     <Stack h={{ base: 'calc(100vh - 60px)', md: '100vh' }} gap="0">
       <Box
@@ -44,7 +45,9 @@ export const Show = (props: CreateProps) => {
       >
         <Group justify="space-between">
           <Group>
-            <Title order={isTablet ? 4 : 2}>{title}</Title>
+            <Title order={isTablet ? 4 : 2}>
+              {title} #{recordId}
+            </Title>
             {isDirty && (
               <Badge
                 color="gray"
@@ -60,7 +63,13 @@ export const Show = (props: CreateProps) => {
           <Group justify="flex-end" gap="xs">
             {isTablet ? (
               <Group gap="xs">
-                <ActionIcon size="md" aria-label="Save" onClick={submitHandler}>
+                <ActionIcon
+                  size="md"
+                  aria-label="Save"
+                  type="submit"
+                  loading={savingState}
+                  disabled={!isDirty}
+                >
                   <FloppyDisk size={14} weight="bold" />
                 </ActionIcon>
                 <ActionIcon
@@ -80,7 +89,9 @@ export const Show = (props: CreateProps) => {
                   variant="filled"
                   radius="md"
                   justify="space-between"
-                  onClick={submitHandler}
+                  type="submit"
+                  loading={savingState}
+                  disabled={!isDirty}
                 >
                   Lưu
                 </Button>

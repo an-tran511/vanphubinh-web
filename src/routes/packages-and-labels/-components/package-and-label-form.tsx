@@ -19,25 +19,31 @@ import {
   NumberInput,
   Button,
   Group,
-  Box,
   ActionIcon,
   Tooltip,
 } from '@mantine/core'
 import { useDebouncedValue, useFocusTrap } from '@mantine/hooks'
-import { Field, FieldArray, FieldArrayItem } from 'houseform'
-import { useMemo, useState } from 'react'
-import { z } from 'zod'
+import { useEffect, useMemo, useState } from 'react'
 import accClasses from '@/components/accordion/Accordion.module.css'
 import { ArrowRight, Cylinder, Info } from '@phosphor-icons/react'
 import { TPartner } from '@/types/partner'
 import { useSuspenseQuery } from '@tanstack/react-query'
+import {
+  Controller,
+  FieldValues,
+  type Control,
+  UseFormStateReturn,
+  useFieldArray,
+} from 'react-hook-form'
+import { SubMouldForm } from './mould-sub-form'
 
 interface PackageAndLabelFormProps {
-  data?: TPackageAndLabel
+  control: Control<TPackageAndLabel>
+  moulds?: TPackageAndLabel['moulds']
+  viewType: 'create' | 'detail'
 }
 export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
-  const { data } = props
-
+  const { control, moulds, viewType } = props
   const [searchPartnerDraft, setSearchPartnerDraft] = useState('')
   const [debouncedSearchPartnerDraft] = useDebouncedValue(
     searchPartnerDraft,
@@ -49,6 +55,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
 
   const [searchCatDraft, setSearchCatDraft] = useState('')
   const [debouncedSearchCatDraft] = useDebouncedValue(searchCatDraft, 300)
+
   //Uoms query
   const uomsQuery = useSuspenseQuery(
     uomsQueryOptions({
@@ -65,9 +72,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
         }))
       : []
   }, [uoms])
-  const onSearchUom = (value: string) => {
-    setSearchUomDraft(value)
-  }
+
   const uomSelectLoading = uomsQuery.isFetching
 
   //Cats query
@@ -102,7 +107,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
   const partnerOptions = useMemo(() => {
     return partners
       ? partners.map((item: TPartner) => ({
-          label: String(item.name),
+          label: String(item.computedName),
           value: String(item.id),
         }))
       : []
@@ -113,25 +118,32 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
   const partnerSelectLoading = partnersQuery.isFetching
   const focusTrapRef = useFocusTrap()
 
+  const { fields, remove, prepend } = useFieldArray({
+    control,
+    name: 'newMoulds',
+  })
+  console.log(fields)
+
   return (
     <Card shadow="0" radius="0" px={{ base: 'lg', md: 'xl' }}>
-      <Field
+      <Controller
         key="name"
         name="name"
-        initialValue={data && data.name}
-        onChangeValidate={z.string().min(1, { message: 'Trường bắt buộc' })}
-      >
-        {({ value, setValue, onBlur, errors }) => (
+        control={control}
+        render={({
+          field,
+          formState: { errors },
+        }: {
+          field: FieldValues
+          formState: UseFormStateReturn<TPackageAndLabel>
+        }) => (
           <Textarea
+            {...field}
+            error={errors?.name?.message}
             autosize
             ref={focusTrapRef}
             minRows={1}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onBlur={onBlur}
-            required
-            aria-required
-            error={errors?.[0]}
+            withAsterisk
             radius="md"
             variant="unstyled"
             label="Tên hàng hoá"
@@ -150,7 +162,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
             }}
           />
         )}
-      </Field>
+      />
       <Tabs defaultValue="info">
         <Tabs.List>
           <Tabs.Tab value="info" leftSection={<Info size={16} />}>
@@ -178,51 +190,52 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
               <Accordion.Panel>
                 <Stack gap="sm">
                   <SimpleGrid cols={{ base: 1, md: 3 }} verticalSpacing="md">
-                    <Field
+                    <Controller
+                      key="uomId"
                       name="uomId"
-                      initialValue={data && String(data.uomId)}
-                      onChangeValidate={z
-                        .string()
-                        .min(1, { message: 'Trường bắt buộc' })
-                        .transform((val) => Number(val))}
-                    >
-                      {({ value, setValue, onBlur, errors }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <CreatableSelect
+                          {...field}
+                          error={errors?.uomId?.message}
                           radius="md"
                           size="sm"
                           required
-                          value={value}
                           label="Đơn vị chính"
                           data={uomOptions}
-                          onChange={(value) => {
-                            setValue(value || '')
-                          }}
-                          onBlur={onBlur}
                           shouldClientFilter={true}
                           searchable
                           creatable
                           isLoadingOptions={uomSelectLoading}
                           rightSection={<ComboboxChevron />}
                           rightSectionPointerEvents="none"
-                          error={errors?.[0]}
                         />
                       )}
-                    </Field>
-                    <Field
+                    />
+                    <Controller
+                      key="secondaryUomId"
                       name="secondaryUomId"
-                      initialValue={data && String(data.secondaryUomId)}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <CreatableSelect
+                          {...field}
+                          error={errors?.secondaryUomId?.message}
                           size="sm"
                           radius="md"
-                          value={value}
                           label="Đơn vị thứ hai"
                           data={uomOptions}
-                          onChange={(value) => {
-                            setValue(value || '')
-                          }}
-                          onBlur={onBlur}
                           searchable
                           shouldClientFilter={true}
                           creatable
@@ -231,51 +244,54 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           rightSectionPointerEvents="none"
                         />
                       )}
-                    </Field>
-                    <Field
+                    />
+                    <Controller
+                      key="purchaseUomId"
                       name="purchaseUomId"
-                      initialValue={data && String(data.purchaseUomId)}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <CreatableSelect
+                          {...field}
+                          error={errors?.purchaseUomId?.message}
                           size="sm"
                           radius="md"
-                          value={value}
                           label="Đơn vị mua hàng"
                           data={uomOptions}
-                          onChange={(value) => {
-                            setValue(value || '')
-                          }}
-                          onBlur={onBlur}
                           searchable
+                          shouldClientFilter={true}
                           creatable
-                          onSearchChange={onSearchUom}
                           isLoadingOptions={uomSelectLoading}
                           rightSection={<ComboboxChevron />}
                           rightSectionPointerEvents="none"
                         />
                       )}
-                    </Field>
+                    />
                   </SimpleGrid>
                   <SimpleGrid cols={{ base: 1, md: 3 }} verticalSpacing="md">
-                    <Field
+                    <Controller
+                      key="partnerId"
                       name="partnerId"
-                      initialValue={data && String(data.partnerId)}
-                      onChangeValidate={z
-                        .string()
-                        .transform((val) => Number(val))}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <CreatableSelect
+                          {...field}
+                          error={errors?.partnerId?.message}
                           size="sm"
                           radius="md"
-                          value={value}
                           label="Khách hàng"
                           data={partnerOptions}
-                          onChange={(value) => {
-                            setValue(value || '')
-                          }}
-                          onBlur={onBlur}
                           searchable
                           creatable
                           onSearchChange={onSearchPartner}
@@ -284,22 +300,25 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           rightSectionPointerEvents="none"
                         />
                       )}
-                    </Field>
-                    <Field
+                    />
+                    <Controller
+                      key="categoryId"
                       name="categoryId"
-                      initialValue={data && String(data.categoryId)}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <CreatableSelect
+                          {...field}
+                          error={errors?.categoryId?.message}
                           size="sm"
                           radius="md"
-                          value={value}
                           label="Loại hàng hoá"
                           data={catOptions}
-                          onChange={(value) => {
-                            setValue(value || '')
-                          }}
-                          onBlur={onBlur}
                           searchable
                           creatable
                           onSearchChange={onSearchCat}
@@ -308,36 +327,73 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           rightSectionPointerEvents="none"
                         />
                       )}
-                    </Field>
-                    <Field name="itemCode" initialValue={data && data.itemCode}>
-                      {({ value, setValue, onBlur }) => (
-                        <TextInput
-                          radius="md"
-                          label="Mã hàng hoá"
-                          size="sm"
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          onBlur={onBlur}
-                        />
-                      )}
-                    </Field>
+                    />
+                    <Group grow>
+                      <Controller
+                        key="firstItemCode"
+                        name="firstItemCode"
+                        control={control}
+                        render={({
+                          field,
+                          formState: { errors },
+                        }: {
+                          field: FieldValues
+                          formState: UseFormStateReturn<TPackageAndLabel>
+                        }) => (
+                          <TextInput
+                            {...field}
+                            error={errors?.firstItemCode?.message}
+                            radius="md"
+                            label="Mã hàng hoá #1"
+                            size="sm"
+                            disabled={viewType === 'create'}
+                          />
+                        )}
+                      />
+                      <Controller
+                        key="secondItemCode"
+                        name="secondItemCode"
+                        control={control}
+                        render={({
+                          field,
+                          formState: { errors },
+                        }: {
+                          field: FieldValues
+                          formState: UseFormStateReturn<TPackageAndLabel>
+                        }) => (
+                          <TextInput
+                            {...field}
+                            error={errors?.secondItemCode?.message}
+                            radius="md"
+                            label="Mã hàng hoá #2"
+                            size="sm"
+                          />
+                        )}
+                      />
+                    </Group>
                   </SimpleGrid>
-
-                  <Field name="note" initialValue={data && data.note}>
-                    {({ value, setValue, onBlur, errors }) => (
+                  <Controller
+                    key="note"
+                    name="note"
+                    control={control}
+                    render={({
+                      field,
+                      formState: { errors },
+                    }: {
+                      field: FieldValues
+                      formState: UseFormStateReturn<TPackageAndLabel>
+                    }) => (
                       <Textarea
+                        {...field}
                         autosize
                         minRows={2}
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
-                        onBlur={onBlur}
-                        error={errors?.[0]}
+                        error={errors?.note?.message}
                         radius="md"
                         label="Ghi chú"
                         placeholder="Ghi chú cho sản phẩm"
                       />
                     )}
-                  </Field>
+                  />
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>
@@ -355,75 +411,95 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                     spacing={{ base: 10, sm: 'xl' }}
                     verticalSpacing="md"
                   >
-                    <Field
+                    <Controller
+                      key="specs.dimension"
                       name="specs.dimension"
-                      initialValue={data && data.specs.dimension}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <TextInput
+                          {...field}
+                          error={errors.specs?.dimension?.message}
+                          size="sm"
+                          radius="md"
                           label="Kích thước (rộng x cao)"
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          onBlur={onBlur}
-                          size="sm"
-                          radius="md"
                         />
                       )}
-                    </Field>
-
-                    <Field
+                    />
+                    <Controller
+                      key="specs.spreadDimension"
                       name="specs.spreadDimension"
-                      initialValue={data && data.specs.spreadDimension}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <TextInput
-                          label="Kt trải (rộng x cao)"
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          onBlur={onBlur}
+                          {...field}
+                          error={errors.specs?.dimension?.message}
                           size="sm"
                           radius="md"
+                          label="Kt trải (rộng x cao)"
                         />
                       )}
-                    </Field>
+                    />
                   </SimpleGrid>
                   <SimpleGrid
                     cols={{ base: 1, md: 2 }}
                     spacing={{ base: 10, sm: 'xl' }}
                     verticalSpacing="md"
                   >
-                    <Field
+                    <Controller
+                      key="specs.thickness"
                       name="specs.thickness"
-                      initialValue={data && data.specs.thickness}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <NumberInput
+                          {...field}
+                          error={errors.specs?.thickness?.message}
+                          size="sm"
                           radius="md"
                           label="Độ dày"
-                          size="sm"
-                          value={value}
-                          onChange={(val) => setValue(val as number)}
-                          onBlur={onBlur}
                           hideControls
                         />
                       )}
-                    </Field>
-                    <Field
+                    />
+
+                    <Controller
+                      key="specs.numberOfColors"
                       name="specs.numberOfColors"
-                      initialValue={data && data.specs.numberOfColors}
-                    >
-                      {({ value, setValue, onBlur }) => (
+                      control={control}
+                      render={({
+                        field,
+                        formState: { errors },
+                      }: {
+                        field: FieldValues
+                        formState: UseFormStateReturn<TPackageAndLabel>
+                      }) => (
                         <NumberInput
+                          {...field}
+                          error={errors.specs?.numberOfColors?.message}
+                          size="sm"
                           radius="md"
                           label="Số màu"
-                          size="sm"
-                          value={value}
-                          onChange={(val) => setValue(val as number)}
-                          onBlur={onBlur}
                           hideControls
                         />
                       )}
-                    </Field>
+                    />
                   </SimpleGrid>
                 </Stack>
               </Accordion.Panel>
@@ -432,16 +508,37 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
         </Tabs.Panel>
 
         <Tabs.Panel value="mould">
-          <Box mt="sm">
-            {' '}
-            {data &&
-              data.moulds.length > 0 &&
-              data.moulds.map((mould, i) => (
+          <Stack>
+            <Group mt="sm" justify="flex-end">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  prepend({})
+                }}
+                size="xs"
+              >
+                Thêm bộ trục
+              </Button>
+            </Group>
+            {fields.map((field, i) => (
+              <SubMouldForm
+                key={field.id}
+                field={field}
+                i={i}
+                control={control}
+                remove={remove}
+              />
+            ))}
+            {moulds &&
+              moulds.length > 0 &&
+              moulds.map((mould, i) => (
                 <Card withBorder shadow="xs" key={`mould-${i}`}>
                   <Card.Section inheritPadding withBorder py="xs">
                     <Group justify="space-between">
                       <Text size="sm" fw={500}>
-                        {mould.name}
+                        #{mould.id} {mould.name}
                       </Text>
                       <Tooltip label="Đi tới trang trục">
                         <ActionIcon variant="default" aria-label="Settings">
@@ -452,7 +549,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                   </Card.Section>
                   <Stack gap="md" mt="sm">
                     <SimpleGrid
-                      cols={{ base: 1, md: 2 }}
+                      cols={{ base: 1, md: 3 }}
                       spacing={{ base: 10, sm: 'xl' }}
                       verticalSpacing="md"
                     >
@@ -460,17 +557,39 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         <Text size="sm" fw="500">
                           Khách hàng
                         </Text>
-                        <Text size="sm">{mould.partner?.name}</Text>
+                        <Text size="sm">{mould.partner?.name || ''}</Text>
                       </Stack>
+                      <Group grow>
+                        <Stack gap="0">
+                          <Text size="sm" fw="500">
+                            Mã trục #1
+                          </Text>
+                          <Text size="sm">
+                            {mould.firstItemCode || <span>&mdash;</span>}
+                          </Text>
+                        </Stack>
+                        <Stack gap="0">
+                          <Text size="sm" fw="500">
+                            Mã trục #2
+                          </Text>
+                          <Text size="sm">
+                            {mould.secondItemCode || <span>&mdash;</span>}
+                          </Text>
+                        </Stack>
+                      </Group>
                       <Stack gap="0">
                         <Text size="sm" fw="500">
-                          Mã trục
+                          Nhà trục
                         </Text>
-                        <Text size="sm">{mould.itemCode}</Text>
+                        <Text size="sm">
+                          {(mould?.suppliers && mould?.suppliers[0]?.name) || (
+                            <span>&mdash;</span>
+                          )}
+                        </Text>
                       </Stack>
                     </SimpleGrid>
                     <SimpleGrid
-                      cols={{ base: 1, md: 2 }}
+                      cols={{ base: 1, md: 3 }}
                       spacing={{ base: 10, sm: 'xl' }}
                       verticalSpacing="md"
                     >
@@ -478,199 +597,31 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         <Text size="sm" fw="500">
                           Kích thước trục
                         </Text>
-                        <Text size="sm">{mould.specs?.dimension}</Text>
+                        <Text size="sm">
+                          {mould.specs?.dimension || <span>&mdash;</span>}
+                        </Text>
                       </Stack>
                       <Stack gap="0">
                         <Text size="sm" fw="500">
                           Số cây trục trong bộ
                         </Text>
-                        <Text size="sm">{mould.specs?.numberOfMoulds}</Text>
+                        <Text size="sm">
+                          {mould.specs?.numberOfMoulds || <span>&mdash;</span>}
+                        </Text>
                       </Stack>
-                    </SimpleGrid>
-                    <SimpleGrid
-                      cols={{ base: 1, md: 2 }}
-                      spacing={{ base: 10, sm: 'xl' }}
-                      verticalSpacing="md"
-                    >
                       <Stack gap="0">
                         <Text size="sm" fw="500">
                           Vị trí trục
                         </Text>
-                        <Text size="sm">{mould.specs?.location}</Text>
-                      </Stack>
-                      <Stack gap="0">
-                        <Text size="sm" fw="500">
-                          Nhà trục
+                        <Text size="sm">
+                          {mould.specs?.location || <span>&mdash;</span>}
                         </Text>
-                        <Text size="sm">{mould.specs?.mouldMakerId}</Text>
                       </Stack>
                     </SimpleGrid>
                   </Stack>
                 </Card>
               ))}
-          </Box>
-          <FieldArray name={'moulds'}>
-            {({ add, value }) => (
-              <>
-                {value.map((mould, i) => (
-                  <Card
-                    withBorder
-                    radius="md"
-                    mt="sm"
-                    key={`new-mould-${i}`}
-                    shadow="xs"
-                  >
-                    <Stack gap="sm">
-                      <SimpleGrid
-                        cols={{ base: 1, md: 2 }}
-                        spacing={{ base: 10, sm: 'xl' }}
-                        verticalSpacing="md"
-                      >
-                        <FieldArrayItem
-                          name={`moulds[${i}].partnerId`}
-                          key={`mould-specs-partner-${i}`}
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <CreatableSelect
-                              size="sm"
-                              radius="md"
-                              value={value}
-                              label="Khách hàng"
-                              data={partnerOptions}
-                              onChange={(value) => {
-                                setValue(value || '')
-                              }}
-                              onBlur={onBlur}
-                              searchable
-                              creatable
-                              onSearchChange={onSearchPartner}
-                              isLoadingOptions={partnerSelectLoading}
-                              rightSection={<ComboboxChevron />}
-                              rightSectionPointerEvents="none"
-                            />
-                          )}
-                        </FieldArrayItem>
-                        <FieldArrayItem
-                          name={`moulds[${i}].itemCode`}
-                          key={`mould-itemCode-${i}`}
-                          initialValue={
-                            (data && data.moulds[0]?.itemCode) || ''
-                          }
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <TextInput
-                              radius="md"
-                              label="Mã trục"
-                              size="sm"
-                              value={value}
-                              onChange={(e) => setValue(e.target.value)}
-                              onBlur={onBlur}
-                            />
-                          )}
-                        </FieldArrayItem>
-                      </SimpleGrid>
-                      <SimpleGrid
-                        cols={{ base: 1, md: 2 }}
-                        spacing={{ base: 10, sm: 'xl' }}
-                        verticalSpacing="md"
-                      >
-                        <FieldArrayItem
-                          name={`moulds[${i}].specs.dimension`}
-                          key={`mould-dimension-${i}`}
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <TextInput
-                              radius="md"
-                              label="Kích thước trục"
-                              size="sm"
-                              value={value}
-                              onChange={(e) => setValue(e.target.value)}
-                              onBlur={onBlur}
-                            />
-                          )}
-                        </FieldArrayItem>
-                        <FieldArrayItem
-                          name={`moulds[${i}].specs.numberOfMoulds`}
-                          key={`mould-specs-numberOfMoulds-${i}`}
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <NumberInput
-                              radius="md"
-                              label="Số cây trục trong bộ"
-                              size="sm"
-                              value={value}
-                              onChange={(val) => setValue(val as number)}
-                              onBlur={onBlur}
-                              hideControls
-                            />
-                          )}
-                        </FieldArrayItem>
-                      </SimpleGrid>
-
-                      <SimpleGrid
-                        cols={{ base: 1, md: 2 }}
-                        spacing={{ base: 10, sm: 'xl' }}
-                        verticalSpacing="md"
-                      >
-                        <FieldArrayItem
-                          name={`moulds[${i}].specs.location`}
-                          key={`mould-specs-location-${i}`}
-                          initialValue={data && data.moulds[0]?.specs?.location}
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <TextInput
-                              radius="md"
-                              label="Vị trí trục"
-                              size="sm"
-                              value={value}
-                              onChange={(e) => setValue(e.target.value)}
-                              onBlur={onBlur}
-                            />
-                          )}
-                        </FieldArrayItem>
-                        <FieldArrayItem
-                          name={`moulds[${i}].specs.mouldMakerId`}
-                          key={`mould-specs-itemCode-${i}`}
-                          onChangeValidate={z
-                            .string()
-                            .transform((val) => Number(val))}
-                        >
-                          {({ value, setValue, onBlur }) => (
-                            <CreatableSelect
-                              size="sm"
-                              radius="md"
-                              value={value}
-                              label="Nhà trục"
-                              data={partnerOptions}
-                              onChange={(value) => {
-                                setValue(value || '')
-                              }}
-                              onBlur={onBlur}
-                              searchable
-                              creatable
-                              onSearchChange={onSearchPartner}
-                              isLoadingOptions={partnerSelectLoading}
-                              rightSection={<ComboboxChevron />}
-                              rightSectionPointerEvents="none"
-                            />
-                          )}
-                        </FieldArrayItem>
-                      </SimpleGrid>
-                    </Stack>
-                  </Card>
-                ))}
-                <Group mt="sm" justify="flex-end">
-                  <Button
-                    variant="outline"
-                    onClick={() => add({ specs: {} })}
-                    size="xs"
-                  >
-                    Thêm bộ trục
-                  </Button>
-                </Group>
-              </>
-            )}
-          </FieldArray>
+          </Stack>
         </Tabs.Panel>
       </Tabs>
     </Card>
