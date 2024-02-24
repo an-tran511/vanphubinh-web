@@ -2,8 +2,8 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { DataTable } from 'mantine-datatable'
 import { List } from '@/components/crud/list'
-import { useDebouncedValue, useDisclosure } from '@mantine/hooks'
-import { Badge, Drawer, Group } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
+import { Badge, Box, Drawer, Group, TextInput } from '@mantine/core'
 import { PartnerCreate } from './-components/create'
 import { z } from 'zod'
 import classes from '@/components/table/Table.module.css'
@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react'
 import { partnersQueryOptions } from '@/apis/query-options'
 import { TListResponse } from '@/types/http'
 import { TPartner } from '@/types/partner'
+import { useDebouncedCallback } from 'use-debounce'
 
 const partnerSearchSchema = z.object({
   page: z.number().catch(1),
@@ -39,24 +40,10 @@ function DashboardComponent() {
   const [opened, { open, close }] = useDisclosure(false)
   const { page, searchValue } = useSearch()
   const [searchValueDraft, setSearchValueDraft] = useState(searchValue ?? '')
-  const [debouncedSearchValueDraft] = useDebouncedValue(searchValueDraft, 500)
-
-  useEffect(() => {
-    navigate({
-      search: (old: any) => {
-        return {
-          ...old,
-          searchValue: debouncedSearchValueDraft,
-          page: page ? page : 1,
-        }
-      },
-      replace: true,
-    })
-  }, [debouncedSearchValueDraft, page])
 
   const postsQuery = useSuspenseQuery(
     partnersQueryOptions({
-      deps: { page, searchValue: debouncedSearchValueDraft },
+      deps: { page, searchValue: searchValue },
     }),
   )
   const partnerResponse = postsQuery.data as TListResponse<TPartner>
@@ -116,32 +103,54 @@ function DashboardComponent() {
     total: meta.total,
     onPageChange: (page: number) => {
       navigate({
-        search: () => ({ page: page, searchValue: debouncedSearchValueDraft }),
+        search: () => ({ page: page, searchValue: searchValueDraft }),
       })
     },
     isLoading,
   }
 
+  const handleSearch = (searchValue: string) => {
+    navigate({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      search: (old: any) => {
+        return {
+          ...old,
+          searchValue: searchValue,
+          page: 1,
+        }
+      },
+    })
+  }
+
+  const debounced = useDebouncedCallback(handleSearch, 500)
+
   return (
     <List title="Đối tác" onCreateHandler={open} pagination={pagination}>
-      {/* <Box px={{ base: 'md', md: 'lg' }} py="md" bg="white">
-        <Group justify="space-between">
-          <TextInput 
-            variant="default"
+      <Box py="md" px="lg" bg="white">
+        <Group>
+          <TextInput
+            visibleFrom="md"
+            radius="md"
             placeholder="Tìm kiếm"
             value={searchValueDraft}
-            onChange={(event) => setSearchValueDraft(event.currentTarget.value)}
+            onChange={(event) => {
+              setSearchValueDraft(event.currentTarget.value)
+              debounced(event.target.value)
+            }}
           />
-          <Group gap="xs">
-            <ActionIcon aria-label="Settings" variant="light" size="lg">
-              <ListIcon size={16} />
-            </ActionIcon>
-            <ActionIcon aria-label="Settings" variant="light" size="lg" color="gray">
-              <SquaresFour size={16} />
-            </ActionIcon>
-          </Group>
+          <TextInput
+            size="xs"
+            hiddenFrom="md"
+            radius="md"
+            placeholder="Tìm kiếm"
+            value={searchValueDraft}
+            onChange={(event) => {
+              setSearchValueDraft(event.currentTarget.value)
+              debounced(event.target.value)
+            }}
+          />
         </Group>
-      </Box> */}
+      </Box>
       <DataTable
         withTableBorder={false}
         minHeight={180}

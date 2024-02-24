@@ -2,13 +2,15 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { DataTable } from 'mantine-datatable'
 import { List } from '@/components/crud/list'
-import { useDebouncedValue } from '@mantine/hooks'
 import { ActionIcon, Box, Group, TextInput } from '@mantine/core'
 import { z } from 'zod'
 import classes from '@/components/table/Table.module.css'
 import { useState } from 'react'
 import { packagesAndLabelsQueryOptions } from '@/apis/query-options'
 import { Eye, Trash } from '@phosphor-icons/react'
+import { TPackageAndLabel } from '@/types/package-and-label'
+import { useEffect } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 
 const packageSearchSchema = z.object({
   page: z.number().catch(1),
@@ -35,39 +37,14 @@ export const Route = createFileRoute('/packages-and-labels/')({
 
 function ListComponent() {
   const { useSearch } = Route
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: '/packages-and-labels/' })
   const { page, searchValue } = useSearch()
   const [searchValueDraft, setSearchValueDraft] = useState(searchValue ?? '')
-  const [debouncedSearchValueDraft] = useDebouncedValue(searchValueDraft, 500)
-
-  // useEffect(() => {
-  //   navigate({
-  //     search: (old) => {
-  //       return {
-  //         ...old,
-  //         searchValue: debouncedSearchValueDraft,
-  //         page: 1,
-  //       };
-  //     },
-  //     replace: true,
-  //   });
-  // }, [debouncedSearchValueDraft]);
-
-  // useEffect(() => {
-  //   navigate({
-  //     search: (old) => {
-  //       return {
-  //         ...old,
-  //         page: page ?? 1,
-  //       };
-  //     },
-  //   });
-  // }, [page]);
 
   const packagesQuery = useSuspenseQuery(
     packagesAndLabelsQueryOptions({
       page,
-      searchValue: debouncedSearchValueDraft,
+      searchValue: searchValue,
     }),
   )
   const packages = packagesQuery.data.data
@@ -86,7 +63,6 @@ function ListComponent() {
       accessor: 'specs.dimension',
       title: 'Kích thước',
     },
-
     {
       accessor: 'specs.numberOFColors',
       title: 'Độ dày',
@@ -97,12 +73,19 @@ function ListComponent() {
       title: 'Khách hàng',
     },
     {
-      accessor: '',
+      accessor: 'actions',
       title: 'Thao tác',
-      render: () => {
+      render: (item: TPackageAndLabel) => {
         return (
           <Group>
-            <ActionIcon aria-label="Settings" size="sm" variant="light">
+            <ActionIcon
+              aria-label="Settings"
+              size="sm"
+              variant="light"
+              onClick={() =>
+                navigate({ to: `/packages-and-labels/${item.id}` })
+              }
+            >
               <Eye size={14} weight="bold" />
             </ActionIcon>
             <ActionIcon
@@ -125,22 +108,59 @@ function ListComponent() {
     total: meta.total,
     onPageChange: (page: number) => {
       navigate({
-        search: () => ({ page: page, searchValue: debouncedSearchValueDraft }),
+        search: (old: any) => {
+          return {
+            ...old,
+            page: page,
+          }
+        },
       })
     },
     isLoading,
   }
 
+  useEffect(() => {
+    if (pagination.page > pagination.lastPage) {
+      navigate({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        search: (old: any) => {
+          return {
+            ...old,
+            page: 1,
+          }
+        },
+      })
+    }
+  }, [navigate, pagination.lastPage, pagination.page])
+
+  const handleSearch = (searchValue: string) => {
+    navigate({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      search: (old: any) => {
+        return {
+          ...old,
+          searchValue: searchValue,
+          page: 1,
+        }
+      },
+    })
+  }
+
+  const debounced = useDebouncedCallback(handleSearch, 500)
+
   return (
     <List title="Bao bì & nhãn mác" pagination={pagination}>
-      <Box py="md" px="xl" bg="white">
+      <Box py="md" px="lg" bg="white">
         <Group>
           <TextInput
             visibleFrom="md"
             radius="md"
             placeholder="Tìm kiếm"
             value={searchValueDraft}
-            onChange={(event) => setSearchValueDraft(event.currentTarget.value)}
+            onChange={(event) => {
+              setSearchValueDraft(event.currentTarget.value)
+              debounced(event.target.value)
+            }}
           />
           <TextInput
             size="xs"
@@ -148,7 +168,10 @@ function ListComponent() {
             radius="md"
             placeholder="Tìm kiếm"
             value={searchValueDraft}
-            onChange={(event) => setSearchValueDraft(event.currentTarget.value)}
+            onChange={(event) => {
+              setSearchValueDraft(event.currentTarget.value)
+              debounced(event.target.value)
+            }}
           />
         </Group>
       </Box>

@@ -57,7 +57,7 @@ export const List = (props: ListProps) => {
     <Stack h={{ base: 'calc(100vh - 60px)', md: '100vh' }} gap="0">
       <Box
         py="md"
-        px="xl"
+        px="lg"
         style={{
           borderBottom: '1px solid var(--mantine-color-gray-3)',
         }}
