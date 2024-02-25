@@ -109,6 +109,20 @@ function DashboardComponent() {
     isLoading,
   }
 
+  useEffect(() => {
+    if (pagination.page > pagination.lastPage) {
+      navigate({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        search: (old: any) => {
+          return {
+            ...old,
+            page: 1,
+          }
+        },
+      })
+    }
+  }, [navigate, pagination.lastPage, pagination.page])
+
   const handleSearch = (searchValue: string) => {
     navigate({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
