@@ -1,10 +1,10 @@
-export type TPartnerQuery = {
+export type PartnerQuery = {
   searchValue: string
   page: number
   perPage: number
 }
 
-export type TPartner = {
+export type Partner = {
   id: number
   name: string
   computedName: string
@@ -15,7 +15,7 @@ export type TPartner = {
   isSupplier: boolean
 }
 
-export type TNewPartner = {
+export type NewPartner = {
   name: string
   address: string
   phone: string

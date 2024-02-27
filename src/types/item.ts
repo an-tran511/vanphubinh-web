@@ -1,6 +1,6 @@
-import { TPartner } from './partner'
+import { Partner } from './partner'
 
-export type TItem = {
+export type Item = {
   id: string
   name: string
   uomId: number
@@ -10,7 +10,7 @@ export type TItem = {
   categoryId?: number
   firstItemCode?: string
   secondItemCode?: string
-  suppliers?: TPartner[]
-  partner?: TPartner
+  suppliers?: Partner[]
+  partner?: Partner
   note?: string
 }

@@ -1,7 +1,7 @@
 import { partnersQueryOptions } from '@/apis/query-options'
 import { CreatableSelect } from '@/components/select'
-import { TPackageAndLabel } from '@/types/package-and-label'
-import { TPartner } from '@/types/partner'
+import { PackageAndLabel } from '@/types/package-and-label'
+import { Partner } from '@/types/partner'
 import {
   Card,
   CloseButton,
@@ -25,8 +25,8 @@ import {
 } from 'react-hook-form'
 
 interface newMouldsubFormProps {
-  control: Control<TPackageAndLabel>
-  field: FieldArrayWithId<TPackageAndLabel, 'newMoulds', 'id'>
+  control: Control<PackageAndLabel>
+  field: FieldArrayWithId<PackageAndLabel, 'newMoulds', 'id'>
   i: number
   remove: UseFieldArrayRemove
 }
@@ -44,10 +44,10 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
       noMeta: true,
     }),
   )
-  const partners = partnersQuery.data as TPartner[]
+  const partners = partnersQuery.data as Partner[]
   const partnerOptions = useMemo(() => {
     return partners
-      ? partners.map((item: TPartner) => ({
+      ? partners.map((item: Partner) => ({
           label: String(item.name),
           value: String(item.id),
         }))
@@ -70,10 +70,10 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
       noMeta: true,
     }),
   )
-  const mouldMakers = mouldMakersQuery.data as TPartner[]
+  const mouldMakers = mouldMakersQuery.data as Partner[]
   const mouldMakerOptions = useMemo(() => {
     return mouldMakers
-      ? mouldMakers.map((item: TPartner) => ({
+      ? mouldMakers.map((item: Partner) => ({
           label: String(item.name),
           value: String(item.id),
         }))
@@ -104,7 +104,7 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
               formState: { errors },
             }: {
               field: FieldValues
-              formState: UseFormStateReturn<TPackageAndLabel>
+              formState: UseFormStateReturn<PackageAndLabel>
             }) => (
               <CreatableSelect
                 {...field}
@@ -133,7 +133,7 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
                 formState: { errors },
               }: {
                 field: FieldValues
-                formState: UseFormStateReturn<TPackageAndLabel>
+                formState: UseFormStateReturn<PackageAndLabel>
               }) => (
                 <TextInput
                   {...field}
@@ -154,7 +154,7 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
                 formState: { errors },
               }: {
                 field: FieldValues
-                formState: UseFormStateReturn<TPackageAndLabel>
+                formState: UseFormStateReturn<PackageAndLabel>
               }) => (
                 <TextInput
                   {...field}
@@ -167,22 +167,23 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
             />
           </Group>
           <Controller
-            key={`new-mould-mouldMakerId-${i}`}
-            name={`newMoulds.${i}.mouldMakerId`}
+            key={`new-mould-specs-mouldMakerId-${i}`}
+            name={`newMoulds.${i}.specs.mouldMakerId`}
             control={control}
             render={({
               field,
               formState: { errors },
             }: {
               field: FieldValues
-              formState: UseFormStateReturn<TPackageAndLabel>
+              formState: UseFormStateReturn<PackageAndLabel>
             }) => (
               <CreatableSelect
                 size="sm"
                 radius="md"
                 {...field}
                 label="Nhà trục"
-                error={errors.newMoulds?.[i]?.mouldMakerId?.message}
+                withAsterisk
+                error={errors.newMoulds?.[i]?.specs?.mouldMakerId?.message}
                 data={mouldMakerOptions}
                 searchable
                 creatable
@@ -208,7 +209,7 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
               formState: { errors },
             }: {
               field: FieldValues
-              formState: UseFormStateReturn<TPackageAndLabel>
+              formState: UseFormStateReturn<PackageAndLabel>
             }) => (
               <TextInput
                 {...field}
@@ -228,7 +229,7 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
               formState: { errors },
             }: {
               field: FieldValues
-              formState: UseFormStateReturn<TPackageAndLabel>
+              formState: UseFormStateReturn<PackageAndLabel>
             }) => (
               <NumberInput
                 {...field}
@@ -248,7 +249,7 @@ export const SubMouldForm = (props: newMouldsubFormProps) => {
               formState: { errors },
             }: {
               field: FieldValues
-              formState: UseFormStateReturn<TPackageAndLabel>
+              formState: UseFormStateReturn<PackageAndLabel>
             }) => (
               <TextInput
                 {...field}

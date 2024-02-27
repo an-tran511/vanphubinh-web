@@ -1,4 +1,4 @@
-export type TListResponse<T> = {
+export type ListResponse<T> = {
   data: T[]
   meta: {
     total: number

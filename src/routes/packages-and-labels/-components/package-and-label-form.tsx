@@ -3,9 +3,9 @@ import {
   partnersQueryOptions,
   uomsQueryOptions,
 } from '@/apis/query-options'
-import { TUom } from '@/types/uom'
+import { Uom } from '@/types/uom'
 import { CreatableSelect } from '@/components/select'
-import { TPackageAndLabel } from '@/types/package-and-label'
+import { PackageAndLabel } from '@/types/package-and-label'
 import {
   SimpleGrid,
   Stack,
@@ -23,10 +23,10 @@ import {
   Tooltip,
 } from '@mantine/core'
 import { useDebouncedValue, useFocusTrap } from '@mantine/hooks'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import accClasses from '@/components/accordion/Accordion.module.css'
 import { ArrowRight, Cylinder, Info } from '@phosphor-icons/react'
-import { TPartner } from '@/types/partner'
+import { Partner } from '@/types/partner'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import {
   Controller,
@@ -36,10 +36,11 @@ import {
   useFieldArray,
 } from 'react-hook-form'
 import { SubMouldForm } from './mould-sub-form'
+import { Category } from '@/types/category'
 
 interface PackageAndLabelFormProps {
-  control: Control<TPackageAndLabel>
-  moulds?: TPackageAndLabel['moulds']
+  control: Control<PackageAndLabel>
+  moulds?: PackageAndLabel['moulds']
   viewType: 'create' | 'detail'
 }
 export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
@@ -49,24 +50,20 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
     searchPartnerDraft,
     300,
   )
-
-  const [searchUomDraft, setSearchUomDraft] = useState('')
-  const [debouncedSearchUomDraft] = useDebouncedValue(searchUomDraft, 300)
-
   const [searchCatDraft, setSearchCatDraft] = useState('')
   const [debouncedSearchCatDraft] = useDebouncedValue(searchCatDraft, 300)
 
   //Uoms query
   const uomsQuery = useSuspenseQuery(
     uomsQueryOptions({
-      deps: { page: 1, searchValue: debouncedSearchUomDraft },
+      deps: { page: 1 },
       noMeta: true,
     }),
   )
-  const uoms = uomsQuery.data as TUom[]
+  const uoms = uomsQuery.data as Uom[]
   const uomOptions = useMemo(() => {
     return uoms
-      ? uoms.map((item: TUom) => ({
+      ? uoms.map((item: Uom) => ({
           label: String(item.name),
           value: String(item.id),
         }))
@@ -82,10 +79,10 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
       noMeta: true,
     }),
   )
-  const cats = catsQuery.data as TUom[]
+  const cats = catsQuery.data as Category[]
   const catOptions = useMemo(() => {
     return cats
-      ? cats.map((item: TUom) => ({
+      ? cats.map((item: Category) => ({
           label: String(item.name),
           value: String(item.id),
         }))
@@ -103,10 +100,10 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
       noMeta: true,
     }),
   )
-  const partners = partnersQuery.data as TPartner[]
+  const partners = partnersQuery.data as Partner[]
   const partnerOptions = useMemo(() => {
     return partners
-      ? partners.map((item: TPartner) => ({
+      ? partners.map((item: Partner) => ({
           label: String(item.computedName),
           value: String(item.id),
         }))
@@ -135,7 +132,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
           formState: { errors },
         }: {
           field: FieldValues
-          formState: UseFormStateReturn<TPackageAndLabel>
+          formState: UseFormStateReturn<PackageAndLabel>
         }) => (
           <Textarea
             {...field}
@@ -199,7 +196,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <CreatableSelect
                           {...field}
@@ -227,7 +224,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <CreatableSelect
                           {...field}
@@ -254,7 +251,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <CreatableSelect
                           {...field}
@@ -283,7 +280,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <CreatableSelect
                           {...field}
@@ -310,7 +307,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <CreatableSelect
                           {...field}
@@ -338,7 +335,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           formState: { errors },
                         }: {
                           field: FieldValues
-                          formState: UseFormStateReturn<TPackageAndLabel>
+                          formState: UseFormStateReturn<PackageAndLabel>
                         }) => (
                           <TextInput
                             {...field}
@@ -359,7 +356,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                           formState: { errors },
                         }: {
                           field: FieldValues
-                          formState: UseFormStateReturn<TPackageAndLabel>
+                          formState: UseFormStateReturn<PackageAndLabel>
                         }) => (
                           <TextInput
                             {...field}
@@ -381,7 +378,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                       formState: { errors },
                     }: {
                       field: FieldValues
-                      formState: UseFormStateReturn<TPackageAndLabel>
+                      formState: UseFormStateReturn<PackageAndLabel>
                     }) => (
                       <Textarea
                         {...field}
@@ -420,7 +417,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <TextInput
                           {...field}
@@ -440,7 +437,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <TextInput
                           {...field}
@@ -466,7 +463,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <NumberInput
                           {...field}
@@ -488,7 +485,7 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                         formState: { errors },
                       }: {
                         field: FieldValues
-                        formState: UseFormStateReturn<TPackageAndLabel>
+                        formState: UseFormStateReturn<PackageAndLabel>
                       }) => (
                         <NumberInput
                           {...field}
@@ -515,7 +512,12 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                 type="button"
                 onClick={(e) => {
                   e.preventDefault()
-                  prepend({})
+                  prepend({
+                    partnerId: 0,
+                    specs: {
+                      mouldMakerId: 0,
+                    },
+                  })
                 }}
                 size="xs"
               >

@@ -9,9 +9,9 @@ import { z } from 'zod'
 import classes from '@/components/table/Table.module.css'
 import { useEffect, useState } from 'react'
 import { partnersQueryOptions } from '@/apis/query-options'
-import { TListResponse } from '@/types/http'
-import { TPartner } from '@/types/partner'
 import { useDebouncedCallback } from 'use-debounce'
+import { ListResponse } from '@/types/http'
+import { Partner } from '@/types/partner'
 
 const partnerSearchSchema = z.object({
   page: z.number().catch(1),
@@ -21,7 +21,7 @@ const partnerSearchSchema = z.object({
 })
 
 export const Route = createFileRoute('/partners/')({
-  component: DashboardComponent,
+  component: ListComponent,
   validateSearch: partnerSearchSchema,
   preSearchFilters: [
     (search) => ({
@@ -34,7 +34,7 @@ export const Route = createFileRoute('/partners/')({
     queryClient.ensureQueryData(partnersQueryOptions({ deps })),
 })
 
-function DashboardComponent() {
+function ListComponent() {
   const { useSearch } = Route
   const navigate = useNavigate()
   const [opened, { open, close }] = useDisclosure(false)
@@ -46,7 +46,7 @@ function DashboardComponent() {
       deps: { page, searchValue: searchValue },
     }),
   )
-  const partnerResponse = postsQuery.data as TListResponse<TPartner>
+  const partnerResponse = postsQuery.data as ListResponse<Partner>
   const partners = partnerResponse.data
   const meta = partnerResponse.meta
   const isLoading = postsQuery.isFetching || postsQuery.isLoading
@@ -74,7 +74,7 @@ function DashboardComponent() {
     {
       accessor: '',
       title: 'Loại đối tác',
-      render: (record: TPartner) => {
+      render: (record: Partner) => {
         return (
           <Group gap="xs">
             {record.isCustomer ? (

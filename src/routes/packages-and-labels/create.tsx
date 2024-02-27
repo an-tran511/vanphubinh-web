@@ -1,13 +1,15 @@
 import { Create } from '@/components/crud/create'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation } from '@tanstack/react-query'
-import { TPackageAndLabel } from '@/types/package-and-label'
+import { PackageAndLabel } from '@/types/package-and-label'
 import { createPackageAndLabel } from '@/apis/package-and-label'
 import { toast } from 'sonner'
 import { PackageAndLabelForm } from './-components/package-and-label-form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { schema } from '@/schemas/package-and-label'
+import { modals } from '@mantine/modals'
+import { Text } from '@mantine/core'
 
 export const Route = createFileRoute('/packages-and-labels/create')({
   wrapInSuspense: true,
@@ -20,7 +22,7 @@ export function CreateComponent() {
   //Mutation
   const { isPending, mutate } = useMutation({
     mutationFn: createPackageAndLabel,
-    onSuccess: (data: TPackageAndLabel) => {
+    onSuccess: (data: PackageAndLabel) => {
       const itemId = data.id
       navigate({ to: '/packages-and-labels/$itemId', params: { itemId } })
       toast.success(`${data.name} đã được tạo thành công`)
@@ -30,26 +32,44 @@ export function CreateComponent() {
     },
   })
 
-  const { control, handleSubmit, clearErrors } = useForm<TPackageAndLabel>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      name: '',
-      uomId: 0,
-      firstItemCode: '',
-      secondItemCode: '',
-      note: '',
-      specs: {
-        dimension: '',
-        spreadDimension: '',
-        thickness: undefined,
-        numberOfColors: undefined,
+  const { control, handleSubmit, clearErrors, getValues } =
+    useForm<PackageAndLabel>({
+      resolver: zodResolver(schema),
+      defaultValues: {
+        name: '',
+        uomId: 0,
+        firstItemCode: '',
+        secondItemCode: '',
+        note: '',
+        specs: {
+          dimension: '',
+          spreadDimension: '',
+          thickness: undefined,
+          numberOfColors: undefined,
+        },
+        newMoulds: [],
       },
-      newMoulds: [],
-    },
-  })
+    })
 
-  const onSubmit = (data: TPackageAndLabel) => {
-    mutate(data)
+  const onSubmit = (data: PackageAndLabel) => {
+    const partnerId = getValues('partnerId')
+    if (partnerId) {
+      mutate(data)
+    } else {
+      modals.openConfirmModal({
+        title: 'Bạn chưa chọn khách hàng',
+        centered: true,
+        children: (
+          <Text size="sm">
+            Mã sản phẩm được tạo dựa trên mã khách hàng. Hãy xác nhận bạn không
+            muốn chọn khách hàng.
+          </Text>
+        ),
+        labels: { confirm: 'Xác nhận', cancel: 'Huỷ' },
+        onCancel: () => console.log('Cancel'),
+        onConfirm: () => mutate(data),
+      })
+    }
   }
   return (
     <form

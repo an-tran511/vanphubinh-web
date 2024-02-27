@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
-import { TPackageAndLabelQueryOptions } from '@/apis/query-options'
+import { PackageAndLabelQueryOptions } from '@/apis/query-options'
 import {
   useMutation,
   useQueryClient,
@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query'
 import { Show } from '@/components/crud/show'
 import { PackageAndLabelForm } from './-components/package-and-label-form'
-import { TPackageAndLabel } from '@/types/package-and-label'
+import { PackageAndLabel } from '@/types/package-and-label'
 import { toast } from 'sonner'
 import { updatePackageAndLabel } from '@/apis/package-and-label'
 import { useForm } from 'react-hook-form'
@@ -18,12 +18,12 @@ export const Route = createFileRoute('/packages-and-labels/$id')({
   component: DetailComponent,
   errorComponent: () => <div>error</div>,
   loader: ({ context: { queryClient }, params }) => {
-    queryClient.ensureQueryData(TPackageAndLabelQueryOptions(params.id))
+    queryClient.ensureQueryData(PackageAndLabelQueryOptions(params.id))
   },
 })
 export function DetailComponent() {
   const { id } = useParams({ strict: false })
-  const { data } = useSuspenseQuery(TPackageAndLabelQueryOptions(id))
+  const { data } = useSuspenseQuery(PackageAndLabelQueryOptions(id))
   const navigate = useNavigate({ from: '/packages-and-labels/$itemId' })
   const queryClient = useQueryClient()
   const {
@@ -33,8 +33,8 @@ export function DetailComponent() {
     resetField,
     formState: { isDirty },
     reset,
-  } = useForm<TPackageAndLabel>({
-    // resolver: zodResolver(schema),
+  } = useForm<PackageAndLabel>({
+    resolver: zodResolver(schema),
     defaultValues: {
       id: data.id,
       name: data.name,
@@ -67,7 +67,7 @@ export function DetailComponent() {
     },
   })
 
-  const onSubmit = (data: TPackageAndLabel) => {
+  const onSubmit = (data: PackageAndLabel) => {
     mutate(data, {
       onSuccess: () => {
         resetField('newMoulds', {
@@ -107,12 +107,7 @@ export function DetailComponent() {
         handleSubmit(onSubmit)(e)
       }}
     >
-      <Show
-        title="Bao bì & nhãn mác"
-        isDirty={isDirty}
-        recordId={id}
-        savingState={isPending}
-      >
+      <Show title="Bao bì & nhãn mác" isDirty={isDirty} savingState={isPending}>
         <PackageAndLabelForm
           control={control}
           viewType="detail"

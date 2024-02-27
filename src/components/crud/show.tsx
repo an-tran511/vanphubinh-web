@@ -24,7 +24,7 @@ interface CreateProps {
   title: string
   isDirty?: boolean
   submitHandler?: () => void
-  recordId: string
+  recordId?: string
   savingState?: boolean
 }
 

@@ -1,12 +1,12 @@
-import { TItem } from './item'
+import { Item } from './item'
 
-export type TMould = TItem & {
+export type Mould = Item & {
   specs?: {
     location?: string
     dimension?: string
     numberOfMoulds?: number
+    serialNumber?: string
+    mouldMakerId?: number
   }
 }
-export type TNewMould = Omit<TMould, 'id' | 'uomId' | 'name'> & {
-  mouldMakerId?: number
-}
+export type NewMould = Omit<Mould, 'id' | 'uomId' | 'name'>

@@ -1,10 +1,10 @@
 import { client } from '@/utils/client'
-import { TUom } from '@/types/uom'
-import { TListResponse } from '@/types/http'
+import { Uom } from '@/types/uom'
+import { ListResponse } from '@/types/http'
 
 export const getUoms = async (deps: string | object) => {
   const response = await client.url('/uoms').query(deps).get()
-  return response as TListResponse<TUom>
+  return response as ListResponse<Uom>
 }
 
 // export const createPartner = async (newPartner: NewPartner) => {

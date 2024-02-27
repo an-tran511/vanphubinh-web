@@ -8,7 +8,7 @@ import classes from '@/components/table/Table.module.css'
 import { useState } from 'react'
 import { packagesAndLabelsQueryOptions } from '@/apis/query-options'
 import { Eye, Trash } from '@phosphor-icons/react'
-import { TPackageAndLabel } from '@/types/package-and-label'
+import { PackageAndLabel } from '@/types/package-and-label'
 import { useEffect } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -75,7 +75,7 @@ function ListComponent() {
     {
       accessor: 'actions',
       title: 'Thao tác',
-      render: (item: TPackageAndLabel) => {
+      render: (item: PackageAndLabel) => {
         return (
           <Group>
             <ActionIcon

@@ -2,6 +2,7 @@ import '@mantine/core/styles.layer.css'
 import 'mantine-datatable/styles.layer.css'
 import '@mantine/dropzone/styles.css'
 import { Loader, MantineProvider, Center } from '@mantine/core'
+import { ModalsProvider } from '@mantine/modals'
 import { theme } from './theme'
 import {
   QueryClientProvider,
@@ -60,8 +61,10 @@ function App() {
   return (
     <MantineProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <Toaster richColors />
-        <RouterProvider router={router} />
+        <ModalsProvider>
+          <Toaster richColors />
+          <RouterProvider router={router} />
+        </ModalsProvider>
       </QueryClientProvider>
     </MantineProvider>
   )

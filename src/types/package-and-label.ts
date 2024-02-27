@@ -1,13 +1,14 @@
-import { TItem } from './item'
-import { TMould, TNewMould } from './mould'
+import { Item } from './item'
+import { Mould, NewMould } from './mould'
 
-export type TPackageAndLabel = TItem & {
+export type PackageAndLabel = Item & {
   specs?: {
     dimension?: string
     spreadDimension?: string
     thickness?: number
     numberOfColors?: number
+    serialNumber?: number
   }
-  moulds: TMould[]
-  newMoulds: TNewMould[]
+  moulds: Mould[]
+  newMoulds: NewMould[]
 }

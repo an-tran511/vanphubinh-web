@@ -38,15 +38,14 @@ export const schema = z.object({
           firstItemCode: z.string().trim().optional(),
           secondItemCode: z.string().trim().optional(),
           partnerId: z.coerce.number().gt(0, { message: 'Trường bắt buộc' }),
-          mouldMakerId: z.coerce
-            .number()
-            .gt(0, { message: 'Trường bắt buộc' })
-            .optional(),
           specs: z
             .object({
               location: z.string().trim().optional(),
               dimension: z.string().trim().optional(),
-
+              mouldMakerId: z.coerce
+                .number()
+                .gt(0, { message: 'Trường bắt buộc' })
+                .optional(),
               numberOfMoulds: z.number().positive().optional(),
             })
             .optional(),
