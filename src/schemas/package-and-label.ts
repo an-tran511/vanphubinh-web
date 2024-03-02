@@ -7,19 +7,19 @@ export const schema = z.object({
   partnerId: z.coerce
     .number()
     .optional()
-    .transform((v) => (v ? v : null)),
+    .transform((v) => (v ? v : '')),
   secondaryUomId: z.coerce
     .number()
     .optional()
-    .transform((v) => (v ? v : null)),
+    .transform((v) => (v ? v : '')),
   purchaseUomId: z.coerce
     .number()
     .optional()
-    .transform((v) => (v ? v : null)),
+    .transform((v) => (v ? v : '')),
   categoryId: z.coerce
     .number()
     .optional()
-    .transform((v) => (v ? v : null)),
+    .transform((v) => (v ? v : '')),
   firstItemCode: z.string().trim().optional(),
   secondItemCode: z.string().trim().optional(),
   note: z.string().trim().optional(),
@@ -31,6 +31,7 @@ export const schema = z.object({
       numberOfColors: z.number().positive().optional(),
     })
     .optional(),
+  images: z.array(z.any().optional()).optional(),
   newMoulds: z
     .array(
       z

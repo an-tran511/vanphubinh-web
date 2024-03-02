@@ -108,6 +108,7 @@ function ListComponent() {
     total: meta.total,
     onPageChange: (page: number) => {
       navigate({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         search: (old: any) => {
           return {
             ...old,

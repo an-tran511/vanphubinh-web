@@ -1,13 +1,15 @@
 import { client } from '@/utils/client'
-import { Partner, NewPartner } from 'types/partner'
-import { ListResponse } from 'types/http'
+import { Partner } from '@/types/partner'
 
 export const getPartners = async (deps: string | object) => {
-  const response = await client.url('/partners').query(deps).get()
-  return response as ListResponse<Partner>
+  const { data: response } = await client.get('/partners', { params: deps })
+
+  return response
 }
 
 export const createPartner = async ({ ...newPartner }: Partial<Partner>) => {
-  const response = await client.url('/partners').post(newPartner)
-  return response as Partner
+  const { data: response } = await client.post('/partners', {
+    data: newPartner,
+  })
+  return response
 }

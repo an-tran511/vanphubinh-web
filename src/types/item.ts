@@ -13,4 +13,5 @@ export type Item = {
   suppliers?: Partner[]
   partner?: Partner
   note?: string
+  images?: File[]
 }

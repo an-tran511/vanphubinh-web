@@ -21,22 +21,39 @@ import {
   Group,
   ActionIcon,
   Tooltip,
+  Image,
+  VisuallyHidden,
+  Box,
+  Overlay,
+  AspectRatio,
+  Progress,
+  LoadingOverlay,
 } from '@mantine/core'
-import { useDebouncedValue, useFocusTrap } from '@mantine/hooks'
-import { useMemo, useState } from 'react'
+import { useDebouncedValue, useFocusTrap, useHover } from '@mantine/hooks'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import accClasses from '@/components/accordion/Accordion.module.css'
-import { ArrowRight, Cylinder, Info } from '@phosphor-icons/react'
+import {
+  ArrowRight,
+  Cylinder,
+  Info,
+  PencilSimple,
+  TrashSimple,
+} from '@phosphor-icons/react'
 import { Partner } from '@/types/partner'
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import {
   Controller,
   FieldValues,
   type Control,
   UseFormStateReturn,
   useFieldArray,
+  useFormContext,
 } from 'react-hook-form'
 import { SubMouldForm } from './mould-sub-form'
 import { Category } from '@/types/category'
+import { Dropzone, IMAGE_MIME_TYPE, FileWithPath } from '@mantine/dropzone'
+import { toast } from 'sonner'
+import { uploads } from '@/apis/upload'
 
 interface PackageAndLabelFormProps {
   control: Control<PackageAndLabel>
@@ -119,7 +136,48 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
     control,
     name: 'newMoulds',
   })
-  console.log(fields)
+  const { setValue } = useFormContext()
+  const { mutate, isPending, isSuccess } = useMutation({
+    mutationKey: ['uploads'],
+    mutationFn: uploads,
+    onSuccess: (data) => {
+      setValue('images', data)
+      toast.success(`Upload thành công`)
+    },
+    onError: () => {
+      toast.error('Upload thất bại')
+    },
+  })
+
+  const { hovered, ref } = useHover()
+  const openRef = useRef<() => void>(null)
+
+  const [files, setFiles] = useState<FileWithPath[]>([])
+  const previews =
+    files.length > 0 ? (
+      files.map((file, index) => {
+        const imageUrl = URL.createObjectURL(file)
+        return (
+          <Image
+            key={index}
+            src={imageUrl}
+            h={200}
+            w={200}
+            onLoad={() => URL.revokeObjectURL(imageUrl)}
+          />
+        )
+      })
+    ) : (
+      <Image
+        h={200}
+        w={200}
+        fallbackSrc="https://via.placeholder.com/200?text=Hình+ảnh"
+      />
+    )
+  const onDrop = (acceptedFiles: FileWithPath[]) => {
+    setFiles(acceptedFiles)
+    mutate(acceptedFiles)
+  }
 
   return (
     <Card shadow="0" radius="0" px={{ base: 'lg', md: 'xl' }}>
@@ -391,6 +449,88 @@ export const PackageAndLabelForm = (props: PackageAndLabelFormProps) => {
                       />
                     )}
                   />
+                  <div>
+                    <Text fw={500} size="sm">
+                      Hình ảnh
+                    </Text>
+                    Status
+                    {isPending}
+                    {isSuccess}
+                    <SimpleGrid cols={{ base: 2, sm: 4 }} mt={0}>
+                      <Controller
+                        key="images"
+                        name="images"
+                        control={control}
+                        render={({}: {
+                          field: FieldValues
+                          formState: UseFormStateReturn<PackageAndLabel>
+                        }) => (
+                          <Stack>
+                            <VisuallyHidden>
+                              <Dropzone
+                                accept={IMAGE_MIME_TYPE}
+                                openRef={openRef}
+                                onDrop={onDrop}
+                                w={200}
+                                h={200}
+                                style={{ pointerEvents: 'all' }}
+                              ></Dropzone>
+                            </VisuallyHidden>
+                            <Box w={200} h={200}>
+                              <AspectRatio ref={ref}>
+                                <LoadingOverlay
+                                  visible={isPending}
+                                  zIndex={1000}
+                                  overlayProps={{ radius: 'sm', blur: 2 }}
+                                  loaderProps={{ color: 'pink', type: 'bars' }}
+                                />
+                                {hovered && (
+                                  <Overlay
+                                    opacity={0.98}
+                                    w={200}
+                                    h={200}
+                                    backgroundOpacity={0.2}
+                                    color="red"
+                                    blur={2}
+                                  >
+                                    <Stack h="90%" w="90%" justify="flex-end">
+                                      <Group justify="space-between">
+                                        <ActionIcon
+                                          size="sm"
+                                          onClick={() => openRef.current?.()}
+                                          aria-label="Gradient action icon"
+                                          disabled={isPending}
+                                        >
+                                          <PencilSimple />
+                                        </ActionIcon>
+
+                                        <ActionIcon
+                                          size="sm"
+                                          color="red"
+                                          disabled={isPending}
+                                          aria-label="Gradient action icon"
+                                          onClick={() => setFiles([])}
+                                        >
+                                          <TrashSimple />
+                                        </ActionIcon>
+                                      </Group>
+                                    </Stack>
+                                  </Overlay>
+                                )}
+                                {previews}
+                              </AspectRatio>
+                            </Box>
+                            <Progress
+                              value={50}
+                              size="lg"
+                              w={200}
+                              transitionDuration={200}
+                            />
+                          </Stack>
+                        )}
+                      />
+                    </SimpleGrid>
+                  </div>
                 </Stack>
               </Accordion.Panel>
             </Accordion.Item>

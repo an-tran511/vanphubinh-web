@@ -5,7 +5,7 @@ import { PackageAndLabel } from '@/types/package-and-label'
 import { createPackageAndLabel } from '@/apis/package-and-label'
 import { toast } from 'sonner'
 import { PackageAndLabelForm } from './-components/package-and-label-form'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { schema } from '@/schemas/package-and-label'
 import { modals } from '@mantine/modals'
@@ -32,27 +32,27 @@ export function CreateComponent() {
     },
   })
 
-  const { control, handleSubmit, clearErrors, getValues } =
-    useForm<PackageAndLabel>({
-      resolver: zodResolver(schema),
-      defaultValues: {
-        name: '',
-        uomId: 0,
-        firstItemCode: '',
-        secondItemCode: '',
-        note: '',
-        specs: {
-          dimension: '',
-          spreadDimension: '',
-          thickness: undefined,
-          numberOfColors: undefined,
-        },
-        newMoulds: [],
+  const methods = useForm<PackageAndLabel>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: '',
+      uomId: 0,
+      firstItemCode: '',
+      secondItemCode: '',
+      note: '',
+      images: [],
+      specs: {
+        dimension: '',
+        spreadDimension: '',
+        thickness: undefined,
+        numberOfColors: undefined,
       },
-    })
+      newMoulds: [],
+    },
+  })
 
   const onSubmit = (data: PackageAndLabel) => {
-    const partnerId = getValues('partnerId')
+    const partnerId = methods.getValues('partnerId')
     if (partnerId) {
       mutate(data)
     } else {
@@ -74,12 +74,14 @@ export function CreateComponent() {
   return (
     <form
       onSubmit={(e) => {
-        clearErrors()
-        handleSubmit(onSubmit)(e)
+        methods.clearErrors()
+        methods.handleSubmit(onSubmit)(e)
       }}
     >
       <Create title="Bao bì & nhãn mác" savingState={isPending}>
-        <PackageAndLabelForm control={control} viewType="create" />
+        <FormProvider {...methods}>
+          <PackageAndLabelForm control={methods.control} viewType="create" />
+        </FormProvider>
       </Create>
     </form>
   )

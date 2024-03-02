@@ -34,7 +34,7 @@ export function DetailComponent() {
     formState: { isDirty },
     reset,
   } = useForm<PackageAndLabel>({
-    resolver: zodResolver(schema),
+    // resolver: zodResolver(schema),
     defaultValues: {
       id: data.id,
       name: data.name,
@@ -46,6 +46,7 @@ export function DetailComponent() {
       firstItemCode: data.firstItemCode || '',
       secondItemCode: data.secondItemCode || '',
       note: data.note || '',
+      images: data.images || [],
       specs: {
         dimension: data?.specs?.dimension || '',
         numberOfColors: data?.specs?.numberOfColors,
