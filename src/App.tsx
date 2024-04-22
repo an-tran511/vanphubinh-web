@@ -1,5 +1,7 @@
 import "./App.css"
 import "@mantine/core/styles.layer.css"
+import "@mantine/dates/styles.layer.css"
+import "mantine-datatable/styles.layer.css"
 
 import { RouterProvider } from "@tanstack/react-router"
 import { useAuth } from "@/hooks/useAuth"

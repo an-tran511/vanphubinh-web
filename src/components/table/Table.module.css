@@ -1,0 +1,21 @@
+.table {
+  /* height: 100%; */
+  th {
+    font-size: rem(12px);
+  }
+  min-width: 500px;
+}
+
+.tfoot {
+  tr {
+    border-top: 1px solid var(--mantine-color-gray-3);
+    border-bottom: none;
+    td {
+      padding: 5px 10px;
+    }
+  }
+}
+
+.td {
+  padding: 0;
+}

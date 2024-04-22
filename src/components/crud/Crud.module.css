@@ -1,0 +1,29 @@
+.navbar {
+  background-color: light-dark(
+    var(--mantine-color-white),
+    var(--mantine-color-dark-6)
+  );
+  height: rem(750px);
+  width: rem(300px);
+  display: flex;
+  flex-direction: column;
+}
+
+.wrapper {
+  display: flex;
+  flex: 1;
+  max-height: calc(100% -60px);
+
+  overflow: hidden;
+}
+
+.main {
+  flex-grow: 1; /* default 0 */
+  border-right: rem(1px) solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  overflow-y: auto;
+}
+.aside {
+  min-width: rem(280px);
+  background-color: var(--mantine-color-gray-0);
+}
