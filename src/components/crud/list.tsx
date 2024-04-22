@@ -68,7 +68,7 @@ export const List = (props: ListProps) => {
 						>
 							Mới
 						</Button>
-						<Title order={isMobile ? 5 : 4}>{title}</Title>
+						<Title order={5}>{title}</Title>
 					</Group>
 					<TextInput
 						leftSection={<MagnifyingGlass />}

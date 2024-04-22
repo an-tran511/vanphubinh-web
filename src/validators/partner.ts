@@ -7,6 +7,7 @@ import {
 	minLength,
 	union,
 	literal,
+	optional,
 } from "valibot"
 
 export const PartnerInputSchema = object({
@@ -18,11 +19,12 @@ export const PartnerInputSchema = object({
 	]),
 	address: string(),
 	notes: string(),
-	city: string(),
-	country: string(),
+	country: string([minLength(2, "Trường bắt buộc")]),
+	city: optional(string()),
 })
 
 export type PartnerCreateInput = Input<typeof PartnerInputSchema>
+export type PartnerEditInput = Input<typeof PartnerInputSchema>
 export type Partner = PartnerCreateInput & {
 	id: string
 }

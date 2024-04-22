@@ -46,6 +46,12 @@ export const findPartnerById = async (partnerId: string) => {
 	return response
 }
 
+export const singlePartnerQueryOption = ({ id }: { id: string }) =>
+	queryOptions({
+		queryKey: ["partners", id],
+		queryFn: () => findPartnerById(id),
+	})
+
 export const getMouldMakers = async (deps: string | object) => {
 	const response = await fetchClient
 		.url("/partners/mould-makers")
